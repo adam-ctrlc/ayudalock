@@ -1,9 +1,9 @@
 import { useState } from "react";
 import { Pressable, View } from "react-native";
-import { useMutation } from "@tanstack/react-query";
 
 import { ApiError } from "@/lib/api/client";
-import { redeem, type Redemption } from "@/lib/api/redemptions";
+import type { Redemption } from "@/lib/api/redemptions";
+import { useRedeem } from "@/lib/queries/redemptions";
 import { cn } from "@/lib/utils";
 import { Screen } from "@/components/ui/screen";
 import { Text } from "@/components/ui/text";
@@ -21,19 +21,7 @@ export default function MerchantRedeem() {
   const [result, setResult] = useState<Redemption | null>(null);
   const [error, setError] = useState<string | null>(null);
 
-  const mutation = useMutation({
-    mutationFn: () =>
-      redeem(mode === "token" ? { token: value.trim() } : { sms_code: value.trim() }),
-    onSuccess: (r) => {
-      setResult(r);
-      setError(null);
-      setValue("");
-    },
-    onError: (e) => {
-      setError(e instanceof ApiError ? e.message : "Redemption failed.");
-      setResult(null);
-    },
-  });
+  const mutation = useRedeem();
 
   return (
     <Screen edges={[]}>
@@ -87,7 +75,24 @@ export default function MerchantRedeem() {
             setError("Enter a code first.");
             return;
           }
-          mutation.mutate();
+          mutation.mutate(
+            mode === "token"
+              ? { token: value.trim() }
+              : { sms_code: value.trim() },
+            {
+              onSuccess: (r) => {
+                setResult(r);
+                setError(null);
+                setValue("");
+              },
+              onError: (e) => {
+                setError(
+                  e instanceof ApiError ? e.message : "Redemption failed.",
+                );
+                setResult(null);
+              },
+            },
+          );
         }}
       />
 

@@ -1,11 +1,10 @@
 import { useState } from "react";
 import { Pressable, View } from "react-native";
 import { useRouter } from "expo-router";
-import { useQuery } from "@tanstack/react-query";
 
 import { ApiError } from "@/lib/api/client";
 import type { RegisterPayload, UserRole } from "@/lib/api/auth";
-import { listLocations } from "@/lib/api/locations";
+import { useLocations } from "@/lib/queries/locations";
 import { useAuth } from "@/lib/auth/context";
 import { cn } from "@/lib/utils";
 import { Screen } from "@/components/ui/screen";
@@ -39,11 +38,7 @@ export default function Register() {
   const [fieldErrors, setFieldErrors] = useState<Record<string, string[]>>({});
   const [loading, setLoading] = useState(false);
 
-  const locations = useQuery({
-    queryKey: ["locations", "register"],
-    queryFn: () => listLocations(),
-    enabled: role === "merchant",
-  });
+  const locations = useLocations({}, role === "merchant");
 
   function fieldError(key: string) {
     return fieldErrors[key]?.[0];

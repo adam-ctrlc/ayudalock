@@ -4,6 +4,10 @@ import { ChartBar, Tag, User } from "phosphor-react-native";
 import { RoleGate } from "@/components/role-gate";
 import { PH_COLORS } from "@/lib/theme";
 
+function tabColor(focused: boolean) {
+  return focused ? PH_COLORS.blue : PH_COLORS.mutedForeground;
+}
+
 export default function LguLayout() {
   return (
     <RoleGate role="lgu_admin">
@@ -19,8 +23,8 @@ export default function LguLayout() {
           name="index"
           options={{
             title: "Dashboard",
-            tabBarIcon: ({ color, size }) => (
-              <ChartBar color={color} size={size} />
+            tabBarIcon: ({ focused, size }) => (
+              <ChartBar color={tabColor(focused)} size={size} />
             ),
           }}
         />
@@ -28,14 +32,18 @@ export default function LguLayout() {
           name="prices"
           options={{
             title: "Prices",
-            tabBarIcon: ({ color, size }) => <Tag color={color} size={size} />,
+            tabBarIcon: ({ focused, size }) => (
+              <Tag color={tabColor(focused)} size={size} />
+            ),
           }}
         />
         <Tabs.Screen
           name="account"
           options={{
             title: "Account",
-            tabBarIcon: ({ color, size }) => <User color={color} size={size} />,
+            tabBarIcon: ({ focused, size }) => (
+              <User color={tabColor(focused)} size={size} />
+            ),
           }}
         />
       </Tabs>

@@ -4,6 +4,10 @@ import { House, MapPin, Tag, User } from "phosphor-react-native";
 import { RoleGate } from "@/components/role-gate";
 import { PH_COLORS } from "@/lib/theme";
 
+function tabColor(focused: boolean) {
+  return focused ? PH_COLORS.blue : PH_COLORS.mutedForeground;
+}
+
 export default function CitizenLayout() {
   return (
     <RoleGate role="citizen">
@@ -19,28 +23,36 @@ export default function CitizenLayout() {
           name="index"
           options={{
             title: "Home",
-            tabBarIcon: ({ color, size }) => <House color={color} size={size} />,
+            tabBarIcon: ({ focused, size }) => (
+              <House color={tabColor(focused)} size={size} />
+            ),
           }}
         />
         <Tabs.Screen
           name="locations"
           options={{
             title: "Claim",
-            tabBarIcon: ({ color, size }) => <MapPin color={color} size={size} />,
+            tabBarIcon: ({ focused, size }) => (
+              <MapPin color={tabColor(focused)} size={size} />
+            ),
           }}
         />
         <Tabs.Screen
           name="prices"
           options={{
             title: "Prices",
-            tabBarIcon: ({ color, size }) => <Tag color={color} size={size} />,
+            tabBarIcon: ({ focused, size }) => (
+              <Tag color={tabColor(focused)} size={size} />
+            ),
           }}
         />
         <Tabs.Screen
           name="account"
           options={{
             title: "Account",
-            tabBarIcon: ({ color, size }) => <User color={color} size={size} />,
+            tabBarIcon: ({ focused, size }) => (
+              <User color={tabColor(focused)} size={size} />
+            ),
           }}
         />
       </Tabs>

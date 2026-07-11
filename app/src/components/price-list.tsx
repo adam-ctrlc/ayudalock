@@ -1,9 +1,9 @@
 import { useState } from "react";
 import { Pressable, View } from "react-native";
-import { useQuery } from "@tanstack/react-query";
 import { TrendDown, TrendUp, Minus } from "phosphor-react-native";
 
-import { listPrices, type PriceCategory } from "@/lib/api/prices";
+import type { PriceCategory } from "@/lib/api/prices";
+import { usePrices } from "@/lib/queries/prices";
 import { cn } from "@/lib/utils";
 import { PH_COLORS } from "@/lib/theme";
 import { Card } from "@/components/ui/card";
@@ -47,11 +47,7 @@ function Trend({
 
 export function PriceList() {
   const [category, setCategory] = useState<PriceCategory | "all">("all");
-  const query = useQuery({
-    queryKey: ["prices", category],
-    queryFn: () =>
-      listPrices(category === "all" ? {} : { category }),
-  });
+  const query = usePrices(category);
 
   return (
     <View className="gap-3">

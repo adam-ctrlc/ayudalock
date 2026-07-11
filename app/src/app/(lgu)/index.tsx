@@ -1,8 +1,7 @@
 import { useCallback } from "react";
 import { View } from "react-native";
-import { useQuery } from "@tanstack/react-query";
 
-import { getHeatmap, getStats } from "@/lib/api/dashboard";
+import { useDashboardStats, useHeatmap } from "@/lib/queries/dashboard";
 import { PH_COLORS } from "@/lib/theme";
 import { Screen } from "@/components/ui/screen";
 import { Text } from "@/components/ui/text";
@@ -46,8 +45,8 @@ function DepletionBar({ rate }: { rate: number }) {
 }
 
 export default function LguDashboard() {
-  const stats = useQuery({ queryKey: ["stats"], queryFn: getStats });
-  const heatmap = useQuery({ queryKey: ["heatmap"], queryFn: getHeatmap });
+  const stats = useDashboardStats();
+  const heatmap = useHeatmap();
 
   const refreshing = stats.isRefetching || heatmap.isRefetching;
   const onRefresh = useCallback(() => {

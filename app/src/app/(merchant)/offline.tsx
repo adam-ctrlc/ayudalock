@@ -1,12 +1,8 @@
 import { useState } from "react";
 import { Alert, Pressable, View } from "react-native";
-import { useMutation } from "@tanstack/react-query";
 
-import {
-  batchRedeem,
-  type BatchItem,
-  type BatchResult,
-} from "@/lib/api/redemptions";
+import type { BatchItem, BatchResult } from "@/lib/api/redemptions";
+import { useOfflineSync } from "@/lib/queries/redemptions";
 import { uuidv4 } from "@/lib/uuid";
 import { cn } from "@/lib/utils";
 import { Screen } from "@/components/ui/screen";
@@ -35,15 +31,7 @@ export default function MerchantOffline() {
   const [queue, setQueue] = useState<BatchItem[]>([]);
   const [results, setResults] = useState<BatchResult[]>([]);
 
-  const sync = useMutation({
-    mutationFn: () => batchRedeem(queue),
-    onSuccess: (res) => {
-      setResults(res);
-      setQueue([]);
-    },
-    onError: () =>
-      Alert.alert("Sync failed", "Check your connection and try again."),
-  });
+  const sync = useOfflineSync();
 
   function add() {
     const v = value.trim();
@@ -136,7 +124,19 @@ export default function MerchantOffline() {
         label={`Sync ${queue.length} redemption(s)`}
         loading={sync.isPending}
         disabled={queue.length === 0}
-        onPress={() => sync.mutate()}
+        onPress={() =>
+          sync.mutate(queue, {
+            onSuccess: (res) => {
+              setResults(res);
+              setQueue([]);
+            },
+            onError: () =>
+              Alert.alert(
+                "Sync failed",
+                "Check your connection and try again.",
+              ),
+          })
+        }
       />
 
       {results.length > 0 ? (

@@ -1,10 +1,9 @@
 import { useState } from "react";
 import { Alert, Pressable, View } from "react-native";
-import { useMutation, useQuery, useQueryClient } from "@tanstack/react-query";
 
 import { ApiError } from "@/lib/api/client";
-import { listLocations } from "@/lib/api/locations";
-import { createAllocation } from "@/lib/api/allocations";
+import { useLocations } from "@/lib/queries/locations";
+import { useCreateAllocation } from "@/lib/queries/allocations";
 import { Screen } from "@/components/ui/screen";
 import { Text } from "@/components/ui/text";
 import { Card } from "@/components/ui/card";
@@ -14,34 +13,11 @@ import { Button } from "@/components/ui/button";
 import { Skeleton } from "@/components/ui/skeleton";
 
 export default function CitizenLocations() {
-  const qc = useQueryClient();
-  const locations = useQuery({
-    queryKey: ["locations", "citizen"],
-    queryFn: () => listLocations(),
-  });
+  const locations = useLocations();
   const [expanded, setExpanded] = useState<number | null>(null);
   const [qty, setQty] = useState<Record<number, string>>({});
 
-  const claim = useMutation({
-    mutationFn: (body: {
-      location_id: number;
-      commodity_id: number;
-      quantity: number;
-    }) => createAllocation(body),
-    onSuccess: () => {
-      qc.invalidateQueries({ queryKey: ["allocations"] });
-      qc.invalidateQueries({ queryKey: ["locations"] });
-      Alert.alert(
-        "Locked!",
-        "Your goods are reserved. Open the Home tab to see your voucher.",
-      );
-    },
-    onError: (e) =>
-      Alert.alert(
-        "Could not lock",
-        e instanceof ApiError ? e.message : "Please try again.",
-      ),
-  });
+  const claim = useCreateAllocation();
 
   return (
     <Screen
@@ -122,11 +98,27 @@ export default function CitizenLocations() {
                                 Alert.alert("Enter a quantity to lock.");
                                 return;
                               }
-                              claim.mutate({
-                                location_id: loc.id,
-                                commodity_id: inv.commodity_id,
-                                quantity: q,
-                              });
+                              claim.mutate(
+                                {
+                                  location_id: loc.id,
+                                  commodity_id: inv.commodity_id,
+                                  quantity: q,
+                                },
+                                {
+                                  onSuccess: () =>
+                                    Alert.alert(
+                                      "Locked!",
+                                      "Your goods are reserved. Open the Home tab to see your voucher.",
+                                    ),
+                                  onError: (e) =>
+                                    Alert.alert(
+                                      "Could not lock",
+                                      e instanceof ApiError
+                                        ? e.message
+                                        : "Please try again.",
+                                    ),
+                                },
+                              );
                             }}
                           />
                         </View>

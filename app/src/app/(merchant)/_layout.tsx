@@ -4,6 +4,10 @@ import { CloudArrowUp, QrCode, User } from "phosphor-react-native";
 import { RoleGate } from "@/components/role-gate";
 import { PH_COLORS } from "@/lib/theme";
 
+function tabColor(focused: boolean) {
+  return focused ? PH_COLORS.blue : PH_COLORS.mutedForeground;
+}
+
 export default function MerchantLayout() {
   return (
     <RoleGate role="merchant">
@@ -19,15 +23,17 @@ export default function MerchantLayout() {
           name="index"
           options={{
             title: "Redeem",
-            tabBarIcon: ({ color, size }) => <QrCode color={color} size={size} />,
+            tabBarIcon: ({ focused, size }) => (
+              <QrCode color={tabColor(focused)} size={size} />
+            ),
           }}
         />
         <Tabs.Screen
           name="offline"
           options={{
             title: "Offline",
-            tabBarIcon: ({ color, size }) => (
-              <CloudArrowUp color={color} size={size} />
+            tabBarIcon: ({ focused, size }) => (
+              <CloudArrowUp color={tabColor(focused)} size={size} />
             ),
           }}
         />
@@ -35,7 +41,9 @@ export default function MerchantLayout() {
           name="account"
           options={{
             title: "Account",
-            tabBarIcon: ({ color, size }) => <User color={color} size={size} />,
+            tabBarIcon: ({ focused, size }) => (
+              <User color={tabColor(focused)} size={size} />
+            ),
           }}
         />
       </Tabs>
