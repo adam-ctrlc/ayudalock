@@ -1,0 +1,7 @@
+/vendor
+/node_modules
+/.env
+/.git
+/storage/app/voucher-keys
+/storage/logs
+/tests
