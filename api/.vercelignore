@@ -2,6 +2,9 @@
 /node_modules
 /.env
 /.git
+/package.json
+/package-lock.json
+/vite.config.js
 /storage/app/voucher-keys
 /storage/logs
 /tests
