@@ -17,7 +17,7 @@ type AuthContextValue = {
   status: Status;
   user: authApi.User | null;
   token: string | null;
-  signIn: (email: string, password: string) => Promise<void>;
+  signIn: (identifier: string, password: string) => Promise<void>;
   signUp: (payload: authApi.RegisterPayload) => Promise<void>;
   signOut: () => Promise<void>;
 };
@@ -66,8 +66,8 @@ export function AuthProvider({ children }: { children: React.ReactNode }) {
   }, []);
 
   const signIn = useCallback(
-    async (email: string, password: string) => {
-      const res = await authApi.login(email, password);
+    async (identifier: string, password: string) => {
+      const res = await authApi.login(identifier, password);
       await apply(res.token, res.user);
     },
     [apply],

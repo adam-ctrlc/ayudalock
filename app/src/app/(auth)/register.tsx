@@ -27,6 +27,7 @@ export default function Register() {
   const router = useRouter();
 
   const [name, setName] = useState("");
+  const [username, setUsername] = useState("");
   const [email, setEmail] = useState("");
   const [password, setPassword] = useState("");
   const [confirm, setConfirm] = useState("");
@@ -51,6 +52,7 @@ export default function Register() {
     try {
       const payload: RegisterPayload = {
         name,
+        username: username || undefined,
         email: email.trim(),
         password,
         password_confirmation: confirm,
@@ -114,6 +116,15 @@ export default function Register() {
       <View className="gap-3">
         <Field label="Full name" error={fieldError("name")}>
           <Input value={name} onChangeText={setName} placeholder="Juan Dela Cruz" />
+        </Field>
+        <Field label="Username" error={fieldError("username")}>
+          <Input
+            value={username}
+            onChangeText={setUsername}
+            autoCapitalize="none"
+            autoCorrect={false}
+            placeholder="juandc"
+          />
         </Field>
         <Field label="Email" error={fieldError("email")}>
           <Input

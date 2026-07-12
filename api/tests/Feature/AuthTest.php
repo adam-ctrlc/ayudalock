@@ -53,11 +53,24 @@ final class AuthTest extends TestCase
         ]);
 
         $response = $this->postJson('/api/auth/login', [
-            'email' => 'jose@example.com',
+            'identifier' => 'jose@example.com',
             'password' => 'secret123',
         ]);
 
         $response->assertOk()->assertJsonStructure(['token', 'user' => ['id']]);
+    }
+
+    public function test_user_can_login_with_username(): void
+    {
+        User::factory()->create([
+            'username' => 'jose',
+            'password' => Hash::make('secret123'),
+        ]);
+
+        $this->postJson('/api/auth/login', [
+            'identifier' => 'jose',
+            'password' => 'secret123',
+        ])->assertOk()->assertJsonPath('user.username', 'jose');
     }
 
     public function test_login_fails_with_wrong_password(): void
@@ -68,7 +81,7 @@ final class AuthTest extends TestCase
         ]);
 
         $this->postJson('/api/auth/login', [
-            'email' => 'jose@example.com',
+            'identifier' => 'jose@example.com',
             'password' => 'wrong-password',
         ])->assertStatus(401);
     }

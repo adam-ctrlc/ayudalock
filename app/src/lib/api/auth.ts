@@ -5,6 +5,7 @@ export type UserRole = "citizen" | "merchant" | "lgu_admin";
 export type User = {
   id: number;
   name: string;
+  username: string | null;
   email: string;
   role: UserRole;
   phil_sys_id: string | null;
@@ -23,6 +24,7 @@ export type AuthResponse = {
 
 export type RegisterPayload = {
   name: string;
+  username?: string;
   email: string;
   password: string;
   password_confirmation: string;
@@ -41,10 +43,10 @@ export function register(payload: RegisterPayload) {
   });
 }
 
-export function login(email: string, password: string) {
+export function login(identifier: string, password: string) {
   return apiRequest<AuthResponse>("/auth/login", {
     method: "POST",
-    body: { email, password },
+    body: { identifier, password },
     auth: false,
   });
 }

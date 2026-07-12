@@ -8,9 +8,7 @@
     },
     "plugins": [
       "expo-router",
-      "expo-image",
       "expo-splash-screen",
-      "expo-status-bar",
       "expo-secure-store"
     ],
     "name": "app",

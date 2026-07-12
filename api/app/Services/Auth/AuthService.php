@@ -23,6 +23,7 @@ final class AuthService
     {
         $user = User::query()->create([
             'name' => $data['name'],
+            'username' => $data['username'] ?? null,
             'email' => $data['email'],
             'password' => $data['password'],
             'role' => $data['role'],
@@ -41,9 +42,12 @@ final class AuthService
     /**
      * @return array{user: User, auth: array<string, mixed>}
      */
-    public function login(string $email, string $password): array
+    public function login(string $identifier, string $password): array
     {
-        $user = User::query()->where('email', $email)->first();
+        $user = User::query()
+            ->where('email', $identifier)
+            ->orWhere('username', $identifier)
+            ->first();
 
         if ($user === null || ! Hash::check($password, $user->password)) {
             throw new DomainException('These credentials do not match our records.', Response::HTTP_UNAUTHORIZED);
