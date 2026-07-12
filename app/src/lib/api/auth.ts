@@ -5,6 +5,9 @@ export type UserRole = "citizen" | "merchant" | "lgu_admin";
 export type User = {
   id: number;
   name: string;
+  first_name: string | null;
+  middle_name: string | null;
+  last_name: string | null;
   username: string | null;
   email: string;
   role: UserRole;
@@ -12,6 +15,8 @@ export type User = {
   phone: string | null;
   barangay_id: number | null;
   location_id: number | null;
+  created_at?: string | null;
+  updated_at?: string | null;
 };
 
 export type AuthResponse = {
@@ -58,4 +63,33 @@ export async function me() {
 
 export function logout() {
   return apiRequest<{ message: string }>("/auth/logout", { method: "POST" });
+}
+
+export async function updateProfile(body: {
+  first_name: string;
+  middle_name?: string | null;
+  last_name: string;
+  email: string;
+  phone?: string | null;
+}) {
+  const res = await apiRequest<{ data: User }>("/auth/profile", {
+    method: "PUT",
+    body,
+  });
+  return res.data;
+}
+
+export function updatePassword(body: {
+  current_password: string;
+  password: string;
+  password_confirmation: string;
+}) {
+  return apiRequest<{ message: string }>("/auth/password", {
+    method: "PUT",
+    body,
+  });
+}
+
+export function deleteAccount() {
+  return apiRequest<{ message: string }>("/auth/account", { method: "DELETE" });
 }

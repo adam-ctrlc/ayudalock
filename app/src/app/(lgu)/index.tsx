@@ -55,7 +55,7 @@ export default function LguDashboard() {
   }, [stats, heatmap]);
 
   return (
-    <Screen edges={[]} refreshing={refreshing} onRefresh={onRefresh}>
+    <Screen edges={["top"]} refreshing={refreshing} onRefresh={onRefresh}>
       <View className="gap-1">
         <Text variant="title">DRRMO Dashboard</Text>
         <Text variant="subtitle">Real-time relief distribution overview.</Text>

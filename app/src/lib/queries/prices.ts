@@ -4,22 +4,41 @@ import {
   createPrice,
   getPriceHistory,
   listPrices,
+  listRegions,
   updatePrice,
   type PriceCategory,
 } from "@/lib/api/prices";
 import { qk } from "@/lib/queries/keys";
 
-export function usePrices(category: PriceCategory | "all" = "all") {
+export function usePrices(
+  category: PriceCategory | "all" = "all",
+  region?: string,
+) {
   return useQuery({
-    queryKey: [...qk.prices, category],
-    queryFn: () => listPrices(category === "all" ? {} : { category }),
+    queryKey: [...qk.prices, category, region ?? "all"],
+    queryFn: ({ signal }) =>
+      listPrices(
+        {
+          ...(category === "all" ? {} : { category }),
+          ...(region ? { region } : {}),
+        },
+        signal,
+      ),
+  });
+}
+
+export function usePriceRegions() {
+  return useQuery({
+    queryKey: [...qk.prices, "regions"],
+    queryFn: ({ signal }) => listRegions(signal),
+    staleTime: 5 * 60 * 1000,
   });
 }
 
 export function usePriceHistory(id: number) {
   return useQuery({
     queryKey: [...qk.prices, id, "history"],
-    queryFn: () => getPriceHistory(id),
+    queryFn: ({ signal }) => getPriceHistory(id, signal),
   });
 }
 

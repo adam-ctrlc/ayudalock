@@ -21,6 +21,9 @@ final class UserResource extends JsonResource
         return [
             'id' => $this->id,
             'name' => $this->name,
+            'first_name' => $this->first_name,
+            'middle_name' => $this->middle_name,
+            'last_name' => $this->last_name,
             'username' => $this->username,
             'email' => $this->email,
             'role' => $this->role->value,
@@ -28,6 +31,8 @@ final class UserResource extends JsonResource
             'phone' => $this->phone,
             'barangay_id' => $this->barangay_id,
             'location_id' => $this->location_id,
+            'created_at' => $this->created_at?->toIso8601String(),
+            'updated_at' => $this->updated_at?->toIso8601String(),
         ];
     }
 }

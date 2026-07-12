@@ -36,7 +36,7 @@ export default function LguPrices() {
 
   return (
     <Screen
-      edges={[]}
+      edges={["top"]}
       refreshing={prices.isRefetching}
       onRefresh={() => prices.refetch()}
     >

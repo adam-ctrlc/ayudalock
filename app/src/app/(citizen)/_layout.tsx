@@ -1,5 +1,5 @@
 import { Tabs } from "expo-router";
-import { House, MapPin, Tag, User } from "phosphor-react-native";
+import { House, MapPin, Megaphone, Tag, User } from "phosphor-react-native";
 
 import { RoleGate } from "@/components/role-gate";
 import { PH_COLORS } from "@/lib/theme";
@@ -13,8 +13,7 @@ export default function CitizenLayout() {
     <RoleGate role="citizen">
       <Tabs
         screenOptions={{
-          headerStyle: { backgroundColor: PH_COLORS.blue },
-          headerTintColor: PH_COLORS.white,
+          headerShown: false,
           tabBarActiveTintColor: PH_COLORS.blue,
           tabBarInactiveTintColor: PH_COLORS.mutedForeground,
         }}
@@ -22,7 +21,7 @@ export default function CitizenLayout() {
         <Tabs.Screen
           name="index"
           options={{
-            title: "Home",
+            tabBarLabel: "Home",
             tabBarIcon: ({ focused, size }) => (
               <House color={tabColor(focused)} size={size} />
             ),
@@ -31,7 +30,7 @@ export default function CitizenLayout() {
         <Tabs.Screen
           name="locations"
           options={{
-            title: "Claim",
+            tabBarLabel: "Claim",
             tabBarIcon: ({ focused, size }) => (
               <MapPin color={tabColor(focused)} size={size} />
             ),
@@ -40,16 +39,25 @@ export default function CitizenLayout() {
         <Tabs.Screen
           name="prices"
           options={{
-            title: "Prices",
+            tabBarLabel: "Prices",
             tabBarIcon: ({ focused, size }) => (
               <Tag color={tabColor(focused)} size={size} />
             ),
           }}
         />
         <Tabs.Screen
+          name="announcements"
+          options={{
+            tabBarLabel: "Alerts",
+            tabBarIcon: ({ focused, size }) => (
+              <Megaphone color={tabColor(focused)} size={size} />
+            ),
+          }}
+        />
+        <Tabs.Screen
           name="account"
           options={{
-            title: "Account",
+            tabBarLabel: "Account",
             tabBarIcon: ({ focused, size }) => (
               <User color={tabColor(focused)} size={size} />
             ),

@@ -24,8 +24,9 @@ export type EligibilityResult = {
   programs: Program[];
 };
 
-export function verifyEligibility() {
+export function verifyEligibility(signal?: AbortSignal) {
   return apiRequest<EligibilityResult>("/eligibility/verify", {
     method: "POST",
+    signal,
   });
 }

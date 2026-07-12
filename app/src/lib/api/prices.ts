@@ -27,21 +27,33 @@ export type PriceHistory = {
   recorded_at: string | null;
 };
 
-export async function listPrices(filters: {
-  category?: PriceCategory;
-  region?: string;
-} = {}) {
+export async function listPrices(
+  filters: {
+    category?: PriceCategory;
+    region?: string;
+  } = {},
+  signal?: AbortSignal,
+) {
   const res = await apiRequest<{ data: PriceReference[] }>("/prices", {
     query: filters,
     auth: false,
+    signal,
   });
   return res.data;
 }
 
-export async function getPriceHistory(id: number) {
+export async function listRegions(signal?: AbortSignal) {
+  const res = await apiRequest<{ data: string[] }>("/prices/regions", {
+    auth: false,
+    signal,
+  });
+  return res.data;
+}
+
+export async function getPriceHistory(id: number, signal?: AbortSignal) {
   const res = await apiRequest<{ data: PriceHistory[] }>(
     `/prices/${id}/history`,
-    { auth: false },
+    { auth: false, signal },
   );
   return res.data;
 }

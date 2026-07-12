@@ -33,11 +33,13 @@ export type DashboardStats = {
   subsidies_by_program: SubsidyByProgram[];
 };
 
-export async function getHeatmap() {
-  const res = await apiRequest<{ data: HeatmapEntry[] }>("/dashboard/heatmap");
+export async function getHeatmap(signal?: AbortSignal) {
+  const res = await apiRequest<{ data: HeatmapEntry[] }>("/dashboard/heatmap", {
+    signal,
+  });
   return res.data;
 }
 
-export function getStats() {
-  return apiRequest<DashboardStats>("/dashboard/stats");
+export function getStats(signal?: AbortSignal) {
+  return apiRequest<DashboardStats>("/dashboard/stats", { signal });
 }

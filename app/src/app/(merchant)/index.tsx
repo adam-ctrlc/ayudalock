@@ -24,7 +24,7 @@ export default function MerchantRedeem() {
   const mutation = useRedeem();
 
   return (
-    <Screen edges={[]}>
+    <Screen edges={["top"]}>
       <View className="gap-1">
         <Text variant="title">Redeem voucher</Text>
         <Text variant="subtitle">Scan or enter the citizen&apos;s code.</Text>

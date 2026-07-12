@@ -6,7 +6,7 @@ import { qk } from "@/lib/queries/keys";
 export function useLocations(filters: LocationFilters = {}, enabled = true) {
   return useQuery({
     queryKey: [...qk.locations, filters],
-    queryFn: () => listLocations(filters),
+    queryFn: ({ signal }) => listLocations(filters, signal),
     enabled,
   });
 }

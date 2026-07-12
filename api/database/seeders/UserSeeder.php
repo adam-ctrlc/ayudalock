@@ -21,6 +21,9 @@ final class UserSeeder extends Seeder
             ['email' => 'citizen@ayudalock.test'],
             [
                 'name' => 'Maria Santos',
+                'first_name' => 'Maria',
+                'middle_name' => 'Reyes',
+                'last_name' => 'Santos',
                 'username' => 'maria',
                 'password' => Hash::make('password'),
                 'role' => UserRole::Citizen->value,
@@ -33,6 +36,9 @@ final class UserSeeder extends Seeder
             ['email' => 'driver@ayudalock.test'],
             [
                 'name' => 'Jose Dela Cruz',
+                'first_name' => 'Jose',
+                'middle_name' => 'Ramos',
+                'last_name' => 'Dela Cruz',
                 'username' => 'jose',
                 'password' => Hash::make('password'),
                 'role' => UserRole::Citizen->value,
@@ -45,6 +51,8 @@ final class UserSeeder extends Seeder
             ['email' => 'merchant@ayudalock.test'],
             [
                 'name' => 'Kadiwa Vendor',
+                'first_name' => 'Kadiwa',
+                'last_name' => 'Vendor',
                 'username' => 'kadiwa',
                 'password' => Hash::make('password'),
                 'role' => UserRole::Merchant->value,
@@ -57,6 +65,8 @@ final class UserSeeder extends Seeder
             ['email' => 'mayor@ayudalock.test'],
             [
                 'name' => 'City DRRMO Admin',
+                'first_name' => 'Andres',
+                'last_name' => 'Bonifacio',
                 'username' => 'mayor',
                 'password' => Hash::make('password'),
                 'role' => UserRole::LguAdmin->value,

@@ -8,7 +8,10 @@ import {
 import { qk } from "@/lib/queries/keys";
 
 export function useAllocations() {
-  return useQuery({ queryKey: qk.allocations, queryFn: listAllocations });
+  return useQuery({
+    queryKey: qk.allocations,
+    queryFn: ({ signal }) => listAllocations(signal),
+  });
 }
 
 export function useCreateAllocation() {

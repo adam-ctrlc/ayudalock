@@ -48,7 +48,7 @@ export default function MerchantOffline() {
   }
 
   return (
-    <Screen edges={[]}>
+    <Screen edges={["top"]}>
       <View className="gap-1">
         <Text variant="title">Offline queue</Text>
         <Text variant="subtitle">

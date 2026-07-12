@@ -23,6 +23,7 @@ final class AllocationResource extends JsonResource
             'status' => $this->status->value,
             'quantity' => (float) $this->quantity,
             'expires_at' => $this->expires_at?->toIso8601String(),
+            'created_at' => $this->created_at?->toIso8601String(),
             'commodity' => new CommodityResource($this->whenLoaded('commodity')),
             'program' => new ProgramResource($this->whenLoaded('program')),
             'location' => new LocationResource($this->whenLoaded('location')),

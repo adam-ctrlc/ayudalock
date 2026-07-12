@@ -1,5 +1,5 @@
 import { Tabs } from "expo-router";
-import { ChartBar, Tag, User } from "phosphor-react-native";
+import { ChartBar, Megaphone, Tag, User } from "phosphor-react-native";
 
 import { RoleGate } from "@/components/role-gate";
 import { PH_COLORS } from "@/lib/theme";
@@ -13,8 +13,7 @@ export default function LguLayout() {
     <RoleGate role="lgu_admin">
       <Tabs
         screenOptions={{
-          headerStyle: { backgroundColor: PH_COLORS.blue },
-          headerTintColor: PH_COLORS.white,
+          headerShown: false,
           tabBarActiveTintColor: PH_COLORS.blue,
           tabBarInactiveTintColor: PH_COLORS.mutedForeground,
         }}
@@ -22,16 +21,25 @@ export default function LguLayout() {
         <Tabs.Screen
           name="index"
           options={{
-            title: "Dashboard",
+            tabBarLabel: "Dashboard",
             tabBarIcon: ({ focused, size }) => (
               <ChartBar color={tabColor(focused)} size={size} />
             ),
           }}
         />
         <Tabs.Screen
+          name="announcements"
+          options={{
+            tabBarLabel: "Alerts",
+            tabBarIcon: ({ focused, size }) => (
+              <Megaphone color={tabColor(focused)} size={size} />
+            ),
+          }}
+        />
+        <Tabs.Screen
           name="prices"
           options={{
-            title: "Prices",
+            tabBarLabel: "Prices",
             tabBarIcon: ({ focused, size }) => (
               <Tag color={tabColor(focused)} size={size} />
             ),
@@ -40,7 +48,7 @@ export default function LguLayout() {
         <Tabs.Screen
           name="account"
           options={{
-            title: "Account",
+            tabBarLabel: "Account",
             tabBarIcon: ({ focused, size }) => (
               <User color={tabColor(focused)} size={size} />
             ),

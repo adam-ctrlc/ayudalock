@@ -21,8 +21,16 @@ final class AuthService
      */
     public function register(array $data): array
     {
+        $parts = preg_split('/\s+/', trim((string) $data['name'])) ?: [];
+        $first = $parts[0] ?? null;
+        $last = count($parts) > 1 ? end($parts) : null;
+        $middle = count($parts) > 2 ? implode(' ', array_slice($parts, 1, -1)) : null;
+
         $user = User::query()->create([
             'name' => $data['name'],
+            'first_name' => $first,
+            'middle_name' => $middle,
+            'last_name' => $last,
             'username' => $data['username'] ?? null,
             'email' => $data['email'],
             'password' => $data['password'],

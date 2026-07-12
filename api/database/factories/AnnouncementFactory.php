@@ -1,0 +1,27 @@
+<?php
+
+namespace Database\Factories;
+
+use App\Enums\AnnouncementCategory;
+use App\Models\Announcement;
+use App\Models\User;
+use Illuminate\Database\Eloquent\Factories\Factory;
+
+/**
+ * @extends Factory<Announcement>
+ */
+class AnnouncementFactory extends Factory
+{
+    /**
+     * @return array<string, mixed>
+     */
+    public function definition(): array
+    {
+        return [
+            'author_id' => User::factory()->lguAdmin(),
+            'title' => fake()->sentence(4),
+            'body' => fake()->paragraph(),
+            'category' => AnnouncementCategory::General->value,
+        ];
+    }
+}

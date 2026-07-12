@@ -17,14 +17,17 @@ export type Allocation = {
   status: AllocationStatus;
   quantity: number;
   expires_at: string | null;
+  created_at?: string | null;
   commodity?: Commodity;
   program?: Program;
   location?: Location;
   voucher?: Voucher;
 };
 
-export async function listAllocations() {
-  const res = await apiRequest<{ data: Allocation[] }>("/allocations");
+export async function listAllocations(signal?: AbortSignal) {
+  const res = await apiRequest<{ data: Allocation[] }>("/allocations", {
+    signal,
+  });
   return res.data;
 }
 

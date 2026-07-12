@@ -20,6 +20,7 @@ type AuthContextValue = {
   signIn: (identifier: string, password: string) => Promise<void>;
   signUp: (payload: authApi.RegisterPayload) => Promise<void>;
   signOut: () => Promise<void>;
+  updateUser: (user: authApi.User) => void;
 };
 
 const AuthContext = createContext<AuthContextValue | undefined>(undefined);
@@ -91,9 +92,13 @@ export function AuthProvider({ children }: { children: React.ReactNode }) {
     await apply(null, null);
   }, [apply]);
 
+  const updateUser = useCallback((nextUser: authApi.User) => {
+    setUser(nextUser);
+  }, []);
+
   return (
     <AuthContext.Provider
-      value={{ status, user, token, signIn, signUp, signOut }}
+      value={{ status, user, token, signIn, signUp, signOut, updateUser }}
     >
       {children}
     </AuthContext.Provider>

@@ -11,6 +11,7 @@ use App\Http\Resources\PriceHistoryResource;
 use App\Http\Resources\PriceReferenceResource;
 use App\Models\PriceReference;
 use App\Services\Price\PriceReferenceService;
+use Illuminate\Http\JsonResponse;
 use Illuminate\Http\Request;
 use Illuminate\Http\Resources\Json\AnonymousResourceCollection;
 
@@ -37,6 +38,17 @@ final class PriceController extends Controller
         $history = $price->histories()->with('recordedBy:id,name')->latest()->get();
 
         return PriceHistoryResource::collection($history);
+    }
+
+    public function regions(): JsonResponse
+    {
+        $regions = PriceReference::query()
+            ->select('region')
+            ->distinct()
+            ->orderBy('region')
+            ->pluck('region');
+
+        return response()->json(['data' => $regions]);
     }
 
     public function store(StorePriceRequest $request): PriceReferenceResource

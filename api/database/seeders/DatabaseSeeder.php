@@ -18,6 +18,7 @@ class DatabaseSeeder extends Seeder
             FranchiseHolderSeeder::class,
             UserSeeder::class,
             PriceReferenceSeeder::class,
+            AnnouncementSeeder::class,
         ]);
     }
 }

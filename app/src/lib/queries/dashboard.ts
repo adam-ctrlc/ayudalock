@@ -4,9 +4,15 @@ import { getHeatmap, getStats } from "@/lib/api/dashboard";
 import { qk } from "@/lib/queries/keys";
 
 export function useDashboardStats() {
-  return useQuery({ queryKey: qk.stats, queryFn: getStats });
+  return useQuery({
+    queryKey: qk.stats,
+    queryFn: ({ signal }) => getStats(signal),
+  });
 }
 
 export function useHeatmap() {
-  return useQuery({ queryKey: qk.heatmap, queryFn: getHeatmap });
+  return useQuery({
+    queryKey: qk.heatmap,
+    queryFn: ({ signal }) => getHeatmap(signal),
+  });
 }
