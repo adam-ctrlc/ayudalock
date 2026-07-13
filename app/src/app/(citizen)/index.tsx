@@ -1,7 +1,7 @@
 import { useCallback } from "react";
 import { Pressable, View } from "react-native";
 import { Link, type Href } from "expo-router";
-import { Basket, SealCheck, Tag } from "phosphor-react-native";
+import { Basket, BookOpen, CaretRight, SealCheck, Tag } from "phosphor-react-native";
 
 import { useEligibility } from "@/lib/queries/eligibility";
 import { useAuth } from "@/lib/auth/context";
@@ -40,8 +40,17 @@ function QuickAction({
   );
 }
 
+function greeting() {
+  const hour = new Date().getHours();
+  if (hour < 12) return "Magandang umaga,";
+  if (hour < 18) return "Magandang hapon,";
+  return "Magandang gabi,";
+}
+
 export default function CitizenHome() {
   const { user } = useAuth();
+  const firstName =
+    user?.first_name?.trim() || user?.name?.split(" ")[0] || "Kabayan";
   const eligibility = useEligibility();
 
   const refreshing = eligibility.isRefetching;
@@ -51,9 +60,13 @@ export default function CitizenHome() {
 
   return (
     <Screen edges={["top"]} refreshing={refreshing} onRefresh={onRefresh}>
-      <View className="gap-0.5">
-        <Text variant="subtitle">Kumusta,</Text>
-        <Text variant="title">{user?.name ?? "Citizen"}</Text>
+      <View className="gap-1">
+        <Text variant="subtitle">{greeting()}</Text>
+        <Text variant="title">{firstName}!</Text>
+        <Text variant="caption">
+          Maligayang pagdating. Narito ang AyudaLock para tumulong sa iyong
+          ayuda at mga serbisyo.
+        </Text>
       </View>
 
       <Card className="gap-3">
@@ -95,6 +108,23 @@ export default function CitizenHome() {
           icon={<Tag size={22} color={PH_COLORS.blue} weight="duotone" />}
         />
       </View>
+
+      <Link href="/guides" asChild>
+        <Pressable className="active:opacity-80">
+          <Card className="flex-row items-center gap-3">
+            <View className="h-11 w-11 items-center justify-center rounded-xl bg-secondary">
+              <BookOpen size={22} color={PH_COLORS.blue} weight="duotone" />
+            </View>
+            <View className="flex-1 gap-0.5">
+              <Text variant="label">Gabay sa Requirements</Text>
+              <Text variant="caption">
+                IDs, benefits, and documents: what to prepare and where to go
+              </Text>
+            </View>
+            <CaretRight size={18} color={PH_COLORS.mutedForeground} />
+          </Card>
+        </Pressable>
+      </Link>
 
       <MarketSnapshot />
 

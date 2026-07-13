@@ -1,5 +1,5 @@
 import { Tabs } from "expo-router";
-import { ChartBar, Megaphone, Tag, User } from "phosphor-react-native";
+import { BookOpen, ChartBar, Megaphone, Tag, User } from "phosphor-react-native";
 
 import { RoleGate } from "@/components/role-gate";
 import { PH_COLORS } from "@/lib/theme";
@@ -42,6 +42,15 @@ export default function LguLayout() {
             tabBarLabel: "Prices",
             tabBarIcon: ({ focused, size }) => (
               <Tag color={tabColor(focused)} size={size} />
+            ),
+          }}
+        />
+        <Tabs.Screen
+          name="guides"
+          options={{
+            tabBarLabel: "Gabay",
+            tabBarIcon: ({ focused, size }) => (
+              <BookOpen color={tabColor(focused)} size={size} />
             ),
           }}
         />

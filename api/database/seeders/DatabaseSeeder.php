@@ -19,6 +19,7 @@ class DatabaseSeeder extends Seeder
             UserSeeder::class,
             PriceReferenceSeeder::class,
             AnnouncementSeeder::class,
+            ServiceGuideSeeder::class,
         ]);
     }
 }

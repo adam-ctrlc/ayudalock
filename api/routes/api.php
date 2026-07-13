@@ -6,6 +6,7 @@ use App\Http\Controllers\Api\AllocationController;
 use App\Http\Controllers\Api\AnnouncementCommentController;
 use App\Http\Controllers\Api\AnnouncementController;
 use App\Http\Controllers\Api\AuthController;
+use App\Http\Controllers\Api\ClaimReminderController;
 use App\Http\Controllers\Api\DashboardController;
 use App\Http\Controllers\Api\EligibilityController;
 use App\Http\Controllers\Api\KeyController;
@@ -13,6 +14,7 @@ use App\Http\Controllers\Api\LocationController;
 use App\Http\Controllers\Api\PriceController;
 use App\Http\Controllers\Api\ProfileController;
 use App\Http\Controllers\Api\RedemptionController;
+use App\Http\Controllers\Api\ServiceGuideController;
 use Illuminate\Support\Facades\Route;
 
 Route::prefix('auth')->group(function (): void {
@@ -35,6 +37,9 @@ Route::get('prices', [PriceController::class, 'index']);
 Route::get('prices/regions', [PriceController::class, 'regions']);
 Route::get('prices/{price}/history', [PriceController::class, 'history']);
 
+Route::get('guides', [ServiceGuideController::class, 'index']);
+Route::get('guides/{guide}', [ServiceGuideController::class, 'show']);
+
 Route::middleware('auth:api')->group(function (): void {
     Route::get('locations', [LocationController::class, 'index']);
     Route::get('locations/{location}', [LocationController::class, 'show']);
@@ -56,6 +61,10 @@ Route::middleware('auth:api')->group(function (): void {
         Route::get('allocations', [AllocationController::class, 'index']);
         Route::post('allocations', [AllocationController::class, 'store']);
         Route::delete('allocations/{allocation}', [AllocationController::class, 'destroy']);
+
+        Route::get('claim-reminders', [ClaimReminderController::class, 'index']);
+        Route::post('claim-reminders', [ClaimReminderController::class, 'store']);
+        Route::delete('claim-reminders/{reminder}', [ClaimReminderController::class, 'destroy']);
     });
 
     Route::middleware('role:merchant')->group(function (): void {
@@ -69,5 +78,9 @@ Route::middleware('auth:api')->group(function (): void {
 
         Route::post('prices', [PriceController::class, 'store']);
         Route::put('prices/{price}', [PriceController::class, 'update']);
+
+        Route::post('guides', [ServiceGuideController::class, 'store']);
+        Route::put('guides/{guide}', [ServiceGuideController::class, 'update']);
+        Route::delete('guides/{guide}', [ServiceGuideController::class, 'destroy']);
     });
 });

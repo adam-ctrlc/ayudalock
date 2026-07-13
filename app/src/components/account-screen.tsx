@@ -2,7 +2,17 @@ import { useState } from "react";
 import { Alert, Pressable, View } from "react-native";
 import { useRouter } from "expo-router";
 import type { Edge } from "react-native-safe-area-context";
-import { Lock } from "phosphor-react-native";
+import {
+  CalendarBlank,
+  ClockCounterClockwise,
+  IdentificationBadge,
+  IdentificationCard,
+  Lock,
+  ShieldCheck,
+  SignOut,
+  UserCircle,
+  Warning,
+} from "phosphor-react-native";
 
 import { ApiError } from "@/lib/api/client";
 import type { UserRole } from "@/lib/api/auth";
@@ -61,17 +71,43 @@ function initialsOf(name: string) {
     .toUpperCase();
 }
 
-function InfoRow({ label, value }: { label: string; value: string }) {
+function InfoRow({
+  icon,
+  label,
+  value,
+}: {
+  icon: React.ReactNode;
+  label: string;
+  value: string;
+}) {
   return (
-    <View className="gap-0.5 py-2.5">
-      <Text variant="caption">{label}</Text>
-      <Text variant="label">{value}</Text>
+    <View className="flex-row items-start gap-3 py-2.5">
+      <View className="mt-0.5">{icon}</View>
+      <View className="flex-1 gap-0.5">
+        <Text variant="caption">{label}</Text>
+        <Text variant="label">{value}</Text>
+      </View>
     </View>
   );
 }
 
 function Divider() {
   return <View className="h-px bg-border" />;
+}
+
+function SectionHeading({
+  icon,
+  children,
+}: {
+  icon: React.ReactNode;
+  children: string;
+}) {
+  return (
+    <View className="flex-row items-center gap-2">
+      {icon}
+      <Text variant="heading">{children}</Text>
+    </View>
+  );
 }
 
 export function AccountScreen({
@@ -220,10 +256,14 @@ export function AccountScreen({
             <Text variant="caption">@{user.username}</Text>
           ) : null}
         </View>
-        <Badge variant={role.variant} label={role.text} />
+        <Badge variant={role.variant} label={role.text} className="self-center" />
       </Card>
 
-      <Text variant="heading">Personal details</Text>
+      <SectionHeading
+        icon={<UserCircle size={20} color={PH_COLORS.blue} weight="duotone" />}
+      >
+        Personal details
+      </SectionHeading>
       <Card>
         <View className="gap-3">
           <Field label="First name">
@@ -300,21 +340,66 @@ export function AccountScreen({
         </View>
       </Card>
 
-      <Text variant="heading">Identity & account</Text>
+      <SectionHeading
+        icon={<ShieldCheck size={20} color={PH_COLORS.blue} weight="duotone" />}
+      >
+        Identity & account
+      </SectionHeading>
       <Card>
         <InfoRow
+          icon={
+            <IdentificationCard
+              size={20}
+              color={PH_COLORS.mutedForeground}
+              weight="duotone"
+            />
+          }
           label="Philippine Identification System (PhilSys) ID"
           value={user?.phil_sys_id ?? "Not linked"}
         />
         <Divider />
-        <InfoRow label="Account role" value={role.text} />
+        <InfoRow
+          icon={
+            <IdentificationBadge
+              size={20}
+              color={PH_COLORS.mutedForeground}
+              weight="duotone"
+            />
+          }
+          label="Account role"
+          value={role.text}
+        />
         <Divider />
-        <InfoRow label="Member since" value={dateLabel(user?.created_at)} />
+        <InfoRow
+          icon={
+            <CalendarBlank
+              size={20}
+              color={PH_COLORS.mutedForeground}
+              weight="duotone"
+            />
+          }
+          label="Member since"
+          value={dateLabel(user?.created_at)}
+        />
         <Divider />
-        <InfoRow label="Last updated" value={dateLabel(user?.updated_at)} />
+        <InfoRow
+          icon={
+            <ClockCounterClockwise
+              size={20}
+              color={PH_COLORS.mutedForeground}
+              weight="duotone"
+            />
+          }
+          label="Last updated"
+          value={dateLabel(user?.updated_at)}
+        />
       </Card>
 
-      <Text variant="heading">Change password</Text>
+      <SectionHeading
+        icon={<Lock size={20} color={PH_COLORS.blue} weight="duotone" />}
+      >
+        Change password
+      </SectionHeading>
       <Card>
         {editingPassword ? (
           <View className="gap-3">
@@ -374,14 +459,19 @@ export function AccountScreen({
 
       <Pressable
         onPress={onSignOut}
-        className="items-center rounded-xl border border-border py-3 active:opacity-60"
+        className="flex-row items-center justify-center gap-2 rounded-xl border border-border py-3 active:opacity-60"
       >
+        <SignOut size={18} color={PH_COLORS.mutedForeground} />
         <Text variant="label" className="text-muted-foreground">
           Sign out
         </Text>
       </Pressable>
 
-      <Text variant="heading">Delete account</Text>
+      <SectionHeading
+        icon={<Warning size={20} color={PH_COLORS.red} weight="duotone" />}
+      >
+        Delete account
+      </SectionHeading>
       <Card className="gap-3">
         <Text variant="caption">
           Permanently delete your account and all related records. This cannot

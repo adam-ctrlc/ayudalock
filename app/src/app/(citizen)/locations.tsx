@@ -12,17 +12,19 @@ import type { Inventory, Location } from "@/lib/api/locations";
 import { useLocations } from "@/lib/queries/locations";
 import { useEligibility } from "@/lib/queries/eligibility";
 import { useCreateAllocation } from "@/lib/queries/allocations";
+import { useCreateReminder } from "@/lib/queries/claim-reminders";
 import { cn } from "@/lib/utils";
+import { unitLabel } from "@/lib/units";
 import { PH_COLORS } from "@/lib/theme";
 import { Screen } from "@/components/ui/screen";
 import { Text } from "@/components/ui/text";
 import { Card } from "@/components/ui/card";
-import { Badge } from "@/components/ui/badge";
 import { Button } from "@/components/ui/button";
 import { Skeleton } from "@/components/ui/skeleton";
 import { Stepper } from "@/components/ui/stepper";
 import { ClaimHistory } from "@/components/claim-history";
 import { MyVouchers } from "@/components/my-vouchers";
+import { ClaimRemindersList } from "@/components/claim-reminders-list";
 
 function Step({ num, text }: { num: string; text: string }) {
   return (
@@ -35,12 +37,20 @@ function Step({ num, text }: { num: string; text: string }) {
   );
 }
 
-type View2 = "available" | "vouchers" | "history";
+type View2 = "available" | "saved" | "vouchers" | "history";
+
+const VIEW_LABELS: Record<View2, string> = {
+  available: "Available",
+  saved: "Saved",
+  vouchers: "Vouchers",
+  history: "History",
+};
 
 export default function CitizenLocations() {
   const eligibility = useEligibility();
   const locations = useLocations();
   const claim = useCreateAllocation();
+  const saveReminder = useCreateReminder();
   const [qty, setQty] = useState<Record<string, number>>({});
   const [view, setView] = useState<View2>("available");
 
@@ -83,6 +93,26 @@ export default function CitizenLocations() {
     );
   }
 
+  function onSave(locationId: number, commodityId: number, quantity: number) {
+    saveReminder.mutate(
+      { location_id: locationId, commodity_id: commodityId, quantity },
+      {
+        onSuccess: () => {
+          setView("saved");
+          Alert.alert(
+            "Saved to your plan",
+            "Find it in the Saved tab so you remember to claim it later.",
+          );
+        },
+        onError: (e) =>
+          Alert.alert(
+            "Could not save",
+            e instanceof ApiError ? e.message : "Please try again.",
+          ),
+      },
+    );
+  }
+
   return (
     <Screen
       edges={["top"]}
@@ -97,14 +127,8 @@ export default function CitizenLocations() {
       </View>
 
       <View className="flex-row gap-2">
-        {(["available", "vouchers", "history"] as View2[]).map((v) => {
+        {(["available", "saved", "vouchers", "history"] as View2[]).map((v) => {
           const active = view === v;
-          const label =
-            v === "available"
-              ? "Available"
-              : v === "vouchers"
-                ? "Vouchers"
-                : "History";
           return (
             <Pressable
               key={v}
@@ -117,12 +141,13 @@ export default function CitizenLocations() {
               )}
             >
               <Text
+                numberOfLines={1}
                 className={cn(
                   "text-sm font-semibold",
                   active ? "text-primary-foreground" : "text-foreground",
                 )}
               >
-                {label}
+                {VIEW_LABELS[v]}
               </Text>
             </Pressable>
           );
@@ -133,6 +158,8 @@ export default function CitizenLocations() {
         <ClaimHistory />
       ) : view === "vouchers" ? (
         <MyVouchers />
+      ) : view === "saved" ? (
+        <ClaimRemindersList onClaimed={() => setView("vouchers")} />
       ) : (
         <>
           <Card className="gap-3 border-0 bg-secondary">
@@ -168,91 +195,125 @@ export default function CitizenLocations() {
           ) : (
             visibleLocations.map(({ loc, items }) => {
               const isStore = loc.type === "kadiwa_store";
+              const accent = isStore ? PH_COLORS.blue : PH_COLORS.red;
+              const tint = isStore ? "#0038a814" : "#ce112614";
               return (
-                <Card key={loc.id} className="gap-3">
+                <Card key={loc.id} className="gap-4">
                   <View className="flex-row items-center gap-3">
-                    <View className="h-10 w-10 items-center justify-center rounded-xl bg-secondary">
+                    <View
+                      className="h-12 w-12 items-center justify-center rounded-2xl"
+                      style={{ backgroundColor: tint }}
+                    >
                       {isStore ? (
-                        <Storefront
-                          size={22}
-                          color={PH_COLORS.blue}
-                          weight="duotone"
-                        />
+                        <Storefront size={24} color={accent} weight="duotone" />
                       ) : (
-                        <GasPump
-                          size={22}
-                          color={PH_COLORS.red}
-                          weight="duotone"
-                        />
+                        <GasPump size={24} color={accent} weight="duotone" />
                       )}
                     </View>
                     <View className="flex-1">
                       <Text variant="heading">{loc.name}</Text>
-                      <Text variant="caption">{loc.barangay ?? ""}</Text>
+                      <Text variant="caption">
+                        {(isStore ? "Kadiwa Store" : "Gas Station") +
+                          (loc.barangay ? ` · ${loc.barangay}` : "")}
+                      </Text>
                     </View>
-                    <Badge variant="success" label="Open" />
+                    <View className="flex-row items-center gap-1.5">
+                      <View
+                        className="h-2 w-2 rounded-full"
+                        style={{ backgroundColor: PH_COLORS.success }}
+                      />
+                      <Text
+                        className="text-xs font-semibold"
+                        style={{ color: PH_COLORS.success }}
+                      >
+                        Open
+                      </Text>
+                    </View>
                   </View>
 
-                  {items.map((inv) => {
-                    const available = Number(inv.quantity_available);
-                    const unit = inv.commodity?.unit ?? "";
-                    const key = `${loc.id}:${inv.commodity_id}`;
-                    const value = qty[key] ?? 1;
-                    const claimingThis =
-                      claim.isPending &&
-                      claim.variables?.commodity_id === inv.commodity_id &&
-                      claim.variables?.location_id === loc.id;
+                  <View>
+                    {items.map((inv, idx) => {
+                      const available = Number(inv.quantity_available);
+                      const unit = inv.commodity?.unit ?? "";
+                      const key = `${loc.id}:${inv.commodity_id}`;
+                      const value = qty[key] ?? 1;
+                      const claimingThis =
+                        claim.isPending &&
+                        claim.variables?.commodity_id === inv.commodity_id &&
+                        claim.variables?.location_id === loc.id;
+                      const savingThis =
+                        saveReminder.isPending &&
+                        saveReminder.variables?.commodity_id ===
+                          inv.commodity_id &&
+                        saveReminder.variables?.location_id === loc.id;
 
-                    return (
-                      <View
-                        key={inv.commodity_id}
-                        className="gap-2.5 rounded-xl bg-secondary p-3"
-                      >
-                        <View className="flex-row items-center justify-between">
-                          <View className="flex-1 pr-2">
-                            <Text variant="label">{inv.commodity?.name}</Text>
-                            <Text variant="caption">
-                              {available} {unit} available
-                            </Text>
-                          </View>
-                          <View className="flex-row items-center gap-1">
-                            <CheckCircle
-                              size={16}
-                              color={PH_COLORS.success}
-                              weight="fill"
-                            />
-                            <Text
-                              className="text-xs font-semibold"
-                              style={{ color: PH_COLORS.success }}
+                      return (
+                        <View
+                          key={inv.commodity_id}
+                          className={cn(
+                            "gap-3",
+                            idx > 0 && "mt-4 border-t border-border pt-4",
+                          )}
+                        >
+                          <View className="flex-row items-start justify-between gap-2">
+                            <View className="flex-1">
+                              <Text variant="label" className="text-base">
+                                {inv.commodity?.name}
+                              </Text>
+                              <Text variant="caption">
+                                {available} {unitLabel(unit)} in stock
+                              </Text>
+                            </View>
+                            <View
+                              className="flex-row items-center gap-1 rounded-full px-2 py-1"
+                              style={{ backgroundColor: "#12805c14" }}
                             >
-                              Claimable
-                            </Text>
+                              <CheckCircle
+                                size={14}
+                                color={PH_COLORS.success}
+                                weight="fill"
+                              />
+                              <Text
+                                className="text-xs font-semibold"
+                                style={{ color: PH_COLORS.success }}
+                              >
+                                Claimable
+                              </Text>
+                            </View>
                           </View>
-                        </View>
 
-                        <View className="flex-row items-center gap-3">
-                          <Stepper
-                            value={value}
-                            onChange={(v) =>
-                              setQty((s) => ({ ...s, [key]: v }))
-                            }
-                            min={1}
-                            max={Math.floor(available)}
-                          />
+                          <View className="flex-row items-center justify-between">
+                            <Text variant="caption">Quantity</Text>
+                            <Stepper
+                              value={value}
+                              onChange={(v) =>
+                                setQty((s) => ({ ...s, [key]: v }))
+                              }
+                              min={1}
+                              max={Math.floor(available)}
+                            />
+                          </View>
+
                           <Button
                             variant="success"
-                            size="sm"
-                            className="flex-1"
-                            label={`Claim ${value} ${unit}`}
+                            label={`Claim ${value} ${unitLabel(unit)}`}
                             loading={claimingThis}
                             onPress={() =>
                               onClaim(loc.id, inv.commodity_id, value)
                             }
                           />
+                          <Button
+                            variant="outline"
+                            label="Remind me to claim this"
+                            loading={savingThis}
+                            onPress={() =>
+                              onSave(loc.id, inv.commodity_id, value)
+                            }
+                          />
                         </View>
-                      </View>
-                    );
-                  })}
+                      );
+                    })}
+                  </View>
                 </Card>
               );
             })
