@@ -1,9 +1,17 @@
 import { useCallback } from "react";
 import { Pressable, View } from "react-native";
 import { Link, type Href } from "expo-router";
-import { Basket, BookOpen, CaretRight, SealCheck, Tag } from "phosphor-react-native";
+import {
+  Basket,
+  BellRinging,
+  BookOpen,
+  CaretRight,
+  SealCheck,
+  Tag,
+} from "phosphor-react-native";
 
 import { useEligibility } from "@/lib/queries/eligibility";
+import { useClaimReminders } from "@/lib/queries/claim-reminders";
 import { useAuth } from "@/lib/auth/context";
 import { PH_COLORS } from "@/lib/theme";
 import { Screen } from "@/components/ui/screen";
@@ -13,6 +21,7 @@ import { Badge } from "@/components/ui/badge";
 import { Skeleton } from "@/components/ui/skeleton";
 import { MarketSnapshot } from "@/components/market-snapshot";
 import { LatestAlerts } from "@/components/latest-alerts";
+import { NotificationBell } from "@/components/notification-bell";
 
 function QuickAction({
   href,
@@ -52,6 +61,8 @@ export default function CitizenHome() {
   const firstName =
     user?.first_name?.trim() || user?.name?.split(" ")[0] || "Kabayan";
   const eligibility = useEligibility();
+  const reminders = useClaimReminders();
+  const dueCount = (reminders.data ?? []).filter((r) => r.due).length;
 
   const refreshing = eligibility.isRefetching;
   const onRefresh = useCallback(() => {
@@ -60,14 +71,37 @@ export default function CitizenHome() {
 
   return (
     <Screen edges={["top"]} refreshing={refreshing} onRefresh={onRefresh}>
-      <View className="gap-1">
-        <Text variant="subtitle">{greeting()}</Text>
-        <Text variant="title">{firstName}!</Text>
-        <Text variant="caption">
-          Maligayang pagdating. Narito ang AyudaLock para tumulong sa iyong
-          ayuda at mga serbisyo.
-        </Text>
+      <View className="flex-row items-start justify-between gap-3">
+        <View className="flex-1 gap-1">
+          <Text variant="subtitle">{greeting()}</Text>
+          <Text variant="title">{firstName}!</Text>
+          <Text variant="caption">
+            Maligayang pagdating. Narito ang AyudaLock para tumulong sa iyong
+            ayuda at mga serbisyo.
+          </Text>
+        </View>
+        <NotificationBell />
       </View>
+
+      {dueCount > 0 ? (
+        <Link href="/(citizen)/locations?view=saved" asChild>
+          <Pressable className="active:opacity-90">
+            <Card className="flex-row items-center gap-3 border-accent">
+              <View className="h-11 w-11 items-center justify-center rounded-xl bg-secondary">
+                <BellRinging size={22} color={PH_COLORS.blue} weight="fill" />
+              </View>
+              <View className="flex-1">
+                <Text variant="label">
+                  You have {dueCount} plan{dueCount > 1 ? "s" : ""} to claim
+                  today
+                </Text>
+                <Text variant="caption">Tap to review your saved plans.</Text>
+              </View>
+              <CaretRight size={18} color={PH_COLORS.mutedForeground} />
+            </Card>
+          </Pressable>
+        </Link>
+      ) : null}
 
       <Card className="gap-3">
         <View className="flex-row items-center gap-2">

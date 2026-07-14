@@ -1,5 +1,5 @@
 import { useState } from "react";
-import { Alert, Pressable, View } from "react-native";
+import { Pressable, View } from "react-native";
 import { useRouter } from "expo-router";
 import type { Edge } from "react-native-safe-area-context";
 import {
@@ -31,6 +31,7 @@ import { Field } from "@/components/ui/field";
 import { Button } from "@/components/ui/button";
 import { Badge } from "@/components/ui/badge";
 import { Card } from "@/components/ui/card";
+import { useDialog } from "@/components/ui/dialog";
 
 type BadgeVariant = "secondary" | "accent" | "default";
 
@@ -119,6 +120,7 @@ export function AccountScreen({
 }) {
   const { user, signOut, updateUser } = useAuth();
   const router = useRouter();
+  const dialog = useDialog();
 
   const [firstName, setFirstName] = useState(user?.first_name ?? "");
   const [middleName, setMiddleName] = useState(user?.middle_name ?? "");
@@ -149,7 +151,7 @@ export function AccountScreen({
 
   async function onSaveProfile() {
     if (!firstName.trim() || !lastName.trim() || !email.trim()) {
-      Alert.alert("First name, last name, and email are required.");
+      dialog.alert("First name, last name, and email are required.");
       return;
     }
     setSavingProfile(true);
@@ -163,12 +165,12 @@ export function AccountScreen({
       });
       updateUser(updated);
       setEditingProfile(false);
-      Alert.alert("Saved", "Your profile has been updated.");
+      dialog.alert({ title: "Saved", message: "Your profile has been updated." });
     } catch (e) {
-      Alert.alert(
-        "Could not save",
-        e instanceof ApiError ? e.message : "Please try again.",
-      );
+      dialog.alert({
+        title: "Could not save",
+        message: e instanceof ApiError ? e.message : "Please try again.",
+      });
     } finally {
       setSavingProfile(false);
     }
@@ -183,11 +185,11 @@ export function AccountScreen({
 
   async function onChangePassword() {
     if (!currentPw || !newPw) {
-      Alert.alert("Enter your current and new password.");
+      dialog.alert("Enter your current and new password.");
       return;
     }
     if (newPw !== confirmPw) {
-      Alert.alert("Your new passwords do not match.");
+      dialog.alert("Your new passwords do not match.");
       return;
     }
     setSavingPw(true);
@@ -198,41 +200,38 @@ export function AccountScreen({
         password_confirmation: confirmPw,
       });
       cancelPassword();
-      Alert.alert("Password updated", "Use it the next time you sign in.");
+      dialog.alert({
+        title: "Password updated",
+        message: "Use it the next time you sign in.",
+      });
     } catch (e) {
-      Alert.alert(
-        "Could not update",
-        e instanceof ApiError ? e.message : "Please try again.",
-      );
+      dialog.alert({
+        title: "Could not update",
+        message: e instanceof ApiError ? e.message : "Please try again.",
+      });
     } finally {
       setSavingPw(false);
     }
   }
 
-  function onDeleteAccount() {
-    Alert.alert(
-      "Delete account?",
-      "This permanently removes your account. This cannot be undone.",
-      [
-        { text: "Cancel", style: "cancel" },
-        {
-          text: "Delete",
-          style: "destructive",
-          onPress: async () => {
-            try {
-              await deleteAccount();
-              await signOut();
-              router.replace("/");
-            } catch (e) {
-              Alert.alert(
-                "Could not delete",
-                e instanceof ApiError ? e.message : "Please try again.",
-              );
-            }
-          },
-        },
-      ],
-    );
+  async function onDeleteAccount() {
+    const ok = await dialog.confirm({
+      title: "Delete account?",
+      message: "This permanently removes your account. This cannot be undone.",
+      confirmLabel: "Delete",
+      destructive: true,
+    });
+    if (!ok) return;
+    try {
+      await deleteAccount();
+      await signOut();
+      router.replace("/");
+    } catch (e) {
+      dialog.alert({
+        title: "Could not delete",
+        message: e instanceof ApiError ? e.message : "Please try again.",
+      });
+    }
   }
 
   async function onSignOut() {

@@ -1,5 +1,5 @@
 import { useState } from "react";
-import { Alert, Pressable, TextInput, View } from "react-native";
+import { Pressable, TextInput, View } from "react-native";
 
 import { ApiError } from "@/lib/api/client";
 import type { AnnouncementCategory } from "@/lib/api/announcements";
@@ -15,6 +15,7 @@ import { Input } from "@/components/ui/input";
 import { Field } from "@/components/ui/field";
 import { Button } from "@/components/ui/button";
 import { Card, CardHeader, CardTitle } from "@/components/ui/card";
+import { useDialog } from "@/components/ui/dialog";
 import { AnnouncementFeed } from "@/components/announcement-feed";
 
 const CATEGORIES: { key: AnnouncementCategory; label: string }[] = [
@@ -27,6 +28,7 @@ const CATEGORIES: { key: AnnouncementCategory; label: string }[] = [
 export function AnnouncementsAdmin() {
   const announcements = useAnnouncements();
   const create = useCreateAnnouncement();
+  const dialog = useDialog();
 
   const [category, setCategory] = useState<AnnouncementCategory>("general");
   const [title, setTitle] = useState("");
@@ -34,7 +36,7 @@ export function AnnouncementsAdmin() {
 
   function post() {
     if (!title.trim() || !body.trim()) {
-      Alert.alert("Add a title and a message first.");
+      dialog.alert("Add a title and a message first.");
       return;
     }
     create.mutate(
@@ -44,13 +46,16 @@ export function AnnouncementsAdmin() {
           setTitle("");
           setBody("");
           setCategory("general");
-          Alert.alert("Posted", "Citizens can now see your announcement.");
+          dialog.alert({
+            title: "Posted",
+            message: "Citizens can now see your announcement.",
+          });
         },
         onError: (e) =>
-          Alert.alert(
-            "Could not post",
-            e instanceof ApiError ? e.message : "Please try again.",
-          ),
+          dialog.alert({
+            title: "Could not post",
+            message: e instanceof ApiError ? e.message : "Please try again.",
+          }),
       },
     );
   }

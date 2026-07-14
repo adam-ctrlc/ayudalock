@@ -1,4 +1,4 @@
-import { Alert, Pressable, View } from "react-native";
+import { Pressable, View } from "react-native";
 import {
   CalendarBlank,
   GasPump,
@@ -17,6 +17,7 @@ import { unitLabel } from "@/lib/units";
 import { PH_COLORS } from "@/lib/theme";
 import { Text } from "@/components/ui/text";
 import { Card } from "@/components/ui/card";
+import { useDialog } from "@/components/ui/dialog";
 import { Button } from "@/components/ui/button";
 import { Skeleton } from "@/components/ui/skeleton";
 
@@ -45,6 +46,7 @@ export function ClaimRemindersList({ onClaimed }: { onClaimed?: () => void }) {
   const reminders = useClaimReminders();
   const remove = useDeleteReminder();
   const claim = useCreateAllocation();
+  const dialog = useDialog();
 
   function onClaimNow(r: ClaimReminder) {
     if (!r.location.id || !r.commodity.id) return;
@@ -58,16 +60,16 @@ export function ClaimRemindersList({ onClaimed }: { onClaimed?: () => void }) {
         onSuccess: () => {
           remove.mutate(r.id);
           onClaimed?.();
-          Alert.alert(
-            "Reserved for you!",
-            "Show the code or QR in the Vouchers tab at the store.",
-          );
+          dialog.alert({
+            title: "Reserved for you!",
+            message: "Show the code or QR in the Vouchers tab at the store.",
+          });
         },
         onError: (e) =>
-          Alert.alert(
-            "Could not reserve",
-            e instanceof ApiError ? e.message : "Please try again.",
-          ),
+          dialog.alert({
+            title: "Could not reserve",
+            message: e instanceof ApiError ? e.message : "Please try again.",
+          }),
       },
     );
   }

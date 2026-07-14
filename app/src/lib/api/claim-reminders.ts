@@ -4,6 +4,7 @@ export type ClaimReminder = {
   id: number;
   quantity: number;
   remind_on: string | null;
+  due: boolean;
   location: {
     id: number | null;
     name: string | null;

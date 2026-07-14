@@ -24,6 +24,8 @@ final class AllocationController extends Controller
 
     public function index(Request $request): AnonymousResourceCollection
     {
+        $this->allocations->releaseExpired();
+
         $allocations = Allocation::query()
             ->where('user_id', $request->user()->getKey())
             ->with(['voucher', 'commodity', 'program', 'location'])
@@ -35,6 +37,8 @@ final class AllocationController extends Controller
 
     public function store(StoreAllocationRequest $request): JsonResponse
     {
+        $this->allocations->releaseExpired();
+
         $location = Location::query()->findOrFail($request->integer('location_id'));
         $commodity = Commodity::query()->with('program')->findOrFail($request->integer('commodity_id'));
 

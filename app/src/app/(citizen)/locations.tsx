@@ -1,5 +1,9 @@
 import { useState } from "react";
-import { Alert, Pressable, View } from "react-native";
+import { Pressable, View } from "react-native";
+import { useLocalSearchParams } from "expo-router";
+import DateTimePicker, {
+  type DateTimePickerEvent,
+} from "@react-native-community/datetimepicker";
 import {
   CheckCircle,
   GasPump,
@@ -13,18 +17,21 @@ import { useLocations } from "@/lib/queries/locations";
 import { useEligibility } from "@/lib/queries/eligibility";
 import { useCreateAllocation } from "@/lib/queries/allocations";
 import { useCreateReminder } from "@/lib/queries/claim-reminders";
+import { scheduleClaimReminder } from "@/lib/notifications";
 import { cn } from "@/lib/utils";
 import { unitLabel } from "@/lib/units";
 import { PH_COLORS } from "@/lib/theme";
 import { Screen } from "@/components/ui/screen";
 import { Text } from "@/components/ui/text";
 import { Card } from "@/components/ui/card";
+import { useDialog } from "@/components/ui/dialog";
 import { Button } from "@/components/ui/button";
 import { Skeleton } from "@/components/ui/skeleton";
 import { Stepper } from "@/components/ui/stepper";
 import { ClaimHistory } from "@/components/claim-history";
 import { MyVouchers } from "@/components/my-vouchers";
 import { ClaimRemindersList } from "@/components/claim-reminders-list";
+import { LeafletMap } from "@/components/leaflet-map";
 
 function Step({ num, text }: { num: string; text: string }) {
   return (
@@ -51,8 +58,17 @@ export default function CitizenLocations() {
   const locations = useLocations();
   const claim = useCreateAllocation();
   const saveReminder = useCreateReminder();
+  const dialog = useDialog();
+  const params = useLocalSearchParams<{ view?: string }>();
   const [qty, setQty] = useState<Record<string, number>>({});
-  const [view, setView] = useState<View2>("available");
+  const [view, setView] = useState<View2>(
+    params.view === "saved" ? "saved" : "available",
+  );
+  const [pending, setPending] = useState<{
+    locationId: number;
+    commodityId: number;
+    quantity: number;
+  } | null>(null);
 
   const eligibleProgramIds = new Set(
     (eligibility.data?.programs ?? []).map((p) => p.id),
@@ -73,44 +89,86 @@ export default function CitizenLocations() {
     .map((loc) => ({ loc, items: claimableItems(loc) }))
     .filter((entry) => entry.items.length > 0);
 
+  const claimMarkers = visibleLocations
+    .filter(({ loc }) => loc.latitude != null && loc.longitude != null)
+    .map(({ loc }) => ({
+      lat: Number(loc.latitude),
+      lng: Number(loc.longitude),
+      title: loc.name,
+      color: loc.type === "gas_station" ? PH_COLORS.red : PH_COLORS.blue,
+    }));
+
   function onClaim(locationId: number, commodityId: number, quantity: number) {
     claim.mutate(
       { location_id: locationId, commodity_id: commodityId, quantity },
       {
         onSuccess: () => {
           setView("vouchers");
-          Alert.alert(
-            "Reserved for you!",
-            "Your goods are saved. Show the code or QR here in the Vouchers tab at the store.",
-          );
+          dialog.alert({
+            title: "Reserved for you!",
+            message:
+              "Your goods are saved. Show the code or QR here in the Vouchers tab at the store.",
+          });
         },
         onError: (e) =>
-          Alert.alert(
-            "Could not reserve",
-            e instanceof ApiError ? e.message : "Please try again.",
-          ),
+          dialog.alert({
+            title: "Could not reserve",
+            message: e instanceof ApiError ? e.message : "Please try again.",
+          }),
       },
     );
   }
 
-  function onSave(locationId: number, commodityId: number, quantity: number) {
+  function toYmd(date: Date) {
+    const y = date.getFullYear();
+    const m = String(date.getMonth() + 1).padStart(2, "0");
+    const d = String(date.getDate()).padStart(2, "0");
+    return `${y}-${m}-${d}`;
+  }
+
+  function onSave(
+    locationId: number,
+    commodityId: number,
+    quantity: number,
+    remindOn: string,
+  ) {
     saveReminder.mutate(
-      { location_id: locationId, commodity_id: commodityId, quantity },
       {
-        onSuccess: () => {
+        location_id: locationId,
+        commodity_id: commodityId,
+        quantity,
+        remind_on: remindOn,
+      },
+      {
+        onSuccess: (reminder) => {
           setView("saved");
-          Alert.alert(
-            "Saved to your plan",
-            "Find it in the Saved tab so you remember to claim it later.",
-          );
+          scheduleClaimReminder({
+            id: reminder.id,
+            title: "Time to claim your relief",
+            body: `${reminder.commodity.name ?? "Your item"} at ${
+              reminder.location.name ?? "the store"
+            }`,
+            date: reminder.remind_on ?? remindOn,
+          });
+          dialog.alert({
+            title: "Saved to your plan",
+            message: "Find it in the Saved tab. We'll remind you on your chosen day.",
+          });
         },
         onError: (e) =>
-          Alert.alert(
-            "Could not save",
-            e instanceof ApiError ? e.message : "Please try again.",
-          ),
+          dialog.alert({
+            title: "Could not save",
+            message: e instanceof ApiError ? e.message : "Please try again.",
+          }),
       },
     );
+  }
+
+  function onPickDate(event: DateTimePickerEvent, date?: Date) {
+    const target = pending;
+    setPending(null);
+    if (event.type !== "set" || !date || !target) return;
+    onSave(target.locationId, target.commodityId, target.quantity, toYmd(date));
   }
 
   return (
@@ -193,7 +251,11 @@ export default function CitizenLocations() {
               </Text>
             </Card>
           ) : (
-            visibleLocations.map(({ loc, items }) => {
+            <>
+              {claimMarkers.length > 0 ? (
+                <LeafletMap markers={claimMarkers} />
+              ) : null}
+              {visibleLocations.map(({ loc, items }) => {
               const isStore = loc.type === "kadiwa_store";
               const accent = isStore ? PH_COLORS.blue : PH_COLORS.red;
               const tint = isStore ? "#0038a814" : "#ce112614";
@@ -307,7 +369,11 @@ export default function CitizenLocations() {
                             label="Remind me to claim this"
                             loading={savingThis}
                             onPress={() =>
-                              onSave(loc.id, inv.commodity_id, value)
+                              setPending({
+                                locationId: loc.id,
+                                commodityId: inv.commodity_id,
+                                quantity: value,
+                              })
                             }
                           />
                         </View>
@@ -316,10 +382,20 @@ export default function CitizenLocations() {
                   </View>
                 </Card>
               );
-            })
+            })}
+            </>
           )}
         </>
       )}
+
+      {pending ? (
+        <DateTimePicker
+          value={new Date()}
+          mode="date"
+          minimumDate={new Date()}
+          onChange={onPickDate}
+        />
+      ) : null}
     </Screen>
   );
 }

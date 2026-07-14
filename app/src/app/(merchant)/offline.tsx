@@ -1,5 +1,6 @@
-import { useState } from "react";
-import { Alert, Pressable, View } from "react-native";
+import { useEffect, useState } from "react";
+import { Pressable, View } from "react-native";
+import AsyncStorage from "@react-native-async-storage/async-storage";
 
 import type { BatchItem, BatchResult } from "@/lib/api/redemptions";
 import { useOfflineSync } from "@/lib/queries/redemptions";
@@ -10,9 +11,12 @@ import { Text } from "@/components/ui/text";
 import { Input } from "@/components/ui/input";
 import { Button } from "@/components/ui/button";
 import { Card } from "@/components/ui/card";
+import { useDialog } from "@/components/ui/dialog";
 import { Badge } from "@/components/ui/badge";
 
 type Mode = "sms" | "token";
+
+const QUEUE_KEY = "ayudalock.offline_queue";
 
 function resultVariant(status: BatchResult["status"]) {
   switch (status) {
@@ -30,8 +34,29 @@ export default function MerchantOffline() {
   const [value, setValue] = useState("");
   const [queue, setQueue] = useState<BatchItem[]>([]);
   const [results, setResults] = useState<BatchResult[]>([]);
+  const [hydrated, setHydrated] = useState(false);
 
   const sync = useOfflineSync();
+  const dialog = useDialog();
+
+  useEffect(() => {
+    AsyncStorage.getItem(QUEUE_KEY)
+      .then((raw) => {
+        if (raw) {
+          try {
+            setQueue(JSON.parse(raw) as BatchItem[]);
+          } catch {
+            // ignore corrupted storage
+          }
+        }
+      })
+      .finally(() => setHydrated(true));
+  }, []);
+
+  useEffect(() => {
+    if (!hydrated) return;
+    AsyncStorage.setItem(QUEUE_KEY, JSON.stringify(queue));
+  }, [queue, hydrated]);
 
   function add() {
     const v = value.trim();
@@ -131,10 +156,10 @@ export default function MerchantOffline() {
               setQueue([]);
             },
             onError: () =>
-              Alert.alert(
-                "Sync failed",
-                "Check your connection and try again.",
-              ),
+              dialog.alert({
+                title: "Sync failed",
+                message: "Check your connection and try again.",
+              }),
           })
         }
       />

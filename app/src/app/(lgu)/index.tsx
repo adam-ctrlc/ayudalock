@@ -7,6 +7,8 @@ import { Screen } from "@/components/ui/screen";
 import { Text } from "@/components/ui/text";
 import { Card } from "@/components/ui/card";
 import { Skeleton, SkeletonCard } from "@/components/ui/skeleton";
+import { LeafletMap } from "@/components/leaflet-map";
+import { NotificationBell } from "@/components/notification-bell";
 
 function StatCard({
   label,
@@ -54,11 +56,25 @@ export default function LguDashboard() {
     heatmap.refetch();
   }, [stats, heatmap]);
 
+  const heatMarkers = (heatmap.data ?? [])
+    .filter((b) => b.latitude != null && b.longitude != null)
+    .map((b) => ({
+      lat: Number(b.latitude),
+      lng: Number(b.longitude),
+      title: `${b.name}: ${Math.round(b.depletion_rate * 100)}% depleted`,
+      color: depletionColor(b.depletion_rate),
+    }));
+
   return (
     <Screen edges={["top"]} refreshing={refreshing} onRefresh={onRefresh}>
-      <View className="gap-1">
-        <Text variant="title">DRRMO Dashboard</Text>
-        <Text variant="subtitle">Real-time relief distribution overview.</Text>
+      <View className="flex-row items-start justify-between gap-3">
+        <View className="flex-1 gap-1">
+          <Text variant="title">DRRMO Dashboard</Text>
+          <Text variant="subtitle">
+            Real-time relief distribution overview.
+          </Text>
+        </View>
+        <NotificationBell />
       </View>
 
       {stats.isLoading ? (
@@ -123,6 +139,9 @@ export default function LguDashboard() {
 
       <View className="gap-2">
         <Text variant="heading">Barangay stock heat map</Text>
+        {heatMarkers.length > 0 ? (
+          <LeafletMap markers={heatMarkers} height={280} />
+        ) : null}
         {heatmap.isLoading ? (
           <>
             <SkeletonCard />

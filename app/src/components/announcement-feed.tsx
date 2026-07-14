@@ -1,5 +1,5 @@
 import { useMemo, useState } from "react";
-import { Alert, Pressable, View } from "react-native";
+import { Pressable, View } from "react-native";
 import { MagnifyingGlass } from "phosphor-react-native";
 
 import { ApiError } from "@/lib/api/client";
@@ -12,6 +12,7 @@ import { cn } from "@/lib/utils";
 import { PH_COLORS } from "@/lib/theme";
 import { Text } from "@/components/ui/text";
 import { Card } from "@/components/ui/card";
+import { useDialog } from "@/components/ui/dialog";
 import { Skeleton } from "@/components/ui/skeleton";
 import { IconInput } from "@/components/ui/icon-input";
 import { AnnouncementCard } from "@/components/announcement-card";
@@ -27,6 +28,7 @@ const CATEGORIES: { key: AnnouncementCategory | "all"; label: string }[] = [
 export function AnnouncementFeed({ manage }: { manage?: boolean }) {
   const announcements = useAnnouncements();
   const del = useDeleteAnnouncement();
+  const dialog = useDialog();
   const [category, setCategory] = useState<AnnouncementCategory | "all">("all");
   const [search, setSearch] = useState("");
 
@@ -46,22 +48,21 @@ export function AnnouncementFeed({ manage }: { manage?: boolean }) {
     return data;
   }, [announcements.data, category, search]);
 
-  function confirmDelete(id: number) {
-    Alert.alert("Remove announcement?", "This cannot be undone.", [
-      { text: "Cancel", style: "cancel" },
-      {
-        text: "Remove",
-        style: "destructive",
-        onPress: () =>
-          del.mutate(id, {
-            onError: (e) =>
-              Alert.alert(
-                "Could not remove",
-                e instanceof ApiError ? e.message : "Please try again.",
-              ),
-          }),
-      },
-    ]);
+  async function confirmDelete(id: number) {
+    const ok = await dialog.confirm({
+      title: "Remove announcement?",
+      message: "This cannot be undone.",
+      confirmLabel: "Remove",
+      destructive: true,
+    });
+    if (!ok) return;
+    del.mutate(id, {
+      onError: (e) =>
+        dialog.alert({
+          title: "Could not remove",
+          message: e instanceof ApiError ? e.message : "Please try again.",
+        }),
+    });
   }
 
   return (

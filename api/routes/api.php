@@ -11,6 +11,7 @@ use App\Http\Controllers\Api\DashboardController;
 use App\Http\Controllers\Api\EligibilityController;
 use App\Http\Controllers\Api\KeyController;
 use App\Http\Controllers\Api\LocationController;
+use App\Http\Controllers\Api\NotificationController;
 use App\Http\Controllers\Api\PriceController;
 use App\Http\Controllers\Api\ProfileController;
 use App\Http\Controllers\Api\RedemptionController;
@@ -49,6 +50,10 @@ Route::middleware('auth:api')->group(function (): void {
     Route::get('announcements/{announcement}/comments', [AnnouncementCommentController::class, 'index']);
     Route::post('announcements/{announcement}/comments', [AnnouncementCommentController::class, 'store']);
     Route::delete('announcement-comments/{comment}', [AnnouncementCommentController::class, 'destroy']);
+
+    Route::get('notifications', [NotificationController::class, 'index']);
+    Route::post('notifications/read-all', [NotificationController::class, 'markAllRead']);
+    Route::post('notifications/{notification}/read', [NotificationController::class, 'markRead']);
 
     Route::middleware('role:lgu_admin,merchant')->group(function (): void {
         Route::post('announcements', [AnnouncementController::class, 'store']);

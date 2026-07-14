@@ -1,5 +1,5 @@
 import { useState } from "react";
-import { Alert, Pressable, View } from "react-native";
+import { Pressable, View } from "react-native";
 import { Trash } from "phosphor-react-native";
 
 import { ApiError } from "@/lib/api/client";
@@ -18,6 +18,7 @@ import { Field } from "@/components/ui/field";
 import { Button } from "@/components/ui/button";
 import { Badge } from "@/components/ui/badge";
 import { Card, CardHeader, CardTitle } from "@/components/ui/card";
+import { useDialog } from "@/components/ui/dialog";
 import { Skeleton } from "@/components/ui/skeleton";
 import { GUIDE_CATEGORY_LABEL, GuideIcon } from "@/components/guide-indicators";
 
@@ -43,6 +44,7 @@ export function GuidesAdmin() {
   const guides = useGuides();
   const create = useCreateGuide();
   const remove = useDeleteGuide();
+  const dialog = useDialog();
 
   const [category, setCategory] = useState<GuideCategory>("id");
   const [agency, setAgency] = useState("");
@@ -72,11 +74,11 @@ export function GuidesAdmin() {
     const reqs = lines(requirements);
     const stepList = lines(steps);
     if (!agency.trim() || !title.trim() || !summary.trim()) {
-      Alert.alert("Add an agency, title, and summary first.");
+      dialog.alert("Add an agency, title, and summary first.");
       return;
     }
     if (reqs.length === 0 || stepList.length === 0 || !whereToGo.trim()) {
-      Alert.alert("Add at least one requirement, one step, and where to go.");
+      dialog.alert("Add at least one requirement, one step, and where to go.");
       return;
     }
     create.mutate(
@@ -95,26 +97,28 @@ export function GuidesAdmin() {
       {
         onSuccess: () => {
           reset();
-          Alert.alert("Published", "Citizens can now see this guide.");
+          dialog.alert({
+            title: "Published",
+            message: "Citizens can now see this guide.",
+          });
         },
         onError: (e) =>
-          Alert.alert(
-            "Could not publish",
-            e instanceof ApiError ? e.message : "Please try again.",
-          ),
+          dialog.alert({
+            title: "Could not publish",
+            message: e instanceof ApiError ? e.message : "Please try again.",
+          }),
       },
     );
   }
 
-  function confirmDelete(id: number, guideTitle: string) {
-    Alert.alert("Remove guide?", `"${guideTitle}" will be hidden from citizens.`, [
-      { text: "Cancel", style: "cancel" },
-      {
-        text: "Remove",
-        style: "destructive",
-        onPress: () => remove.mutate(id),
-      },
-    ]);
+  async function confirmDelete(id: number, guideTitle: string) {
+    const ok = await dialog.confirm({
+      title: "Remove guide?",
+      message: `"${guideTitle}" will be hidden from citizens.`,
+      confirmLabel: "Remove",
+      destructive: true,
+    });
+    if (ok) remove.mutate(id);
   }
 
   return (

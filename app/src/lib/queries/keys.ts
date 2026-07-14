@@ -5,6 +5,7 @@ export const qk = {
   locations: ["locations"] as const,
   prices: ["prices"] as const,
   guides: ["guides"] as const,
+  notifications: ["notifications"] as const,
   stats: ["stats"] as const,
   heatmap: ["heatmap"] as const,
 };

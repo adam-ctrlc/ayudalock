@@ -22,6 +22,7 @@ final class ClaimReminderResource extends JsonResource
             'id' => $this->id,
             'quantity' => $this->quantity,
             'remind_on' => $this->remind_on?->toDateString(),
+            'due' => $this->remind_on !== null && $this->remind_on->lte(now()),
             'location' => [
                 'id' => $this->location?->id,
                 'name' => $this->location?->name,

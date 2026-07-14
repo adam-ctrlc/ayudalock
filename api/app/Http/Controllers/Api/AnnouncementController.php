@@ -4,11 +4,14 @@ declare(strict_types=1);
 
 namespace App\Http\Controllers\Api;
 
+use App\Enums\AnnouncementCategory;
 use App\Enums\UserRole;
 use App\Http\Controllers\Controller;
 use App\Http\Requests\Announcement\StoreAnnouncementRequest;
 use App\Http\Resources\AnnouncementResource;
 use App\Models\Announcement;
+use App\Models\User;
+use App\Models\UserNotification;
 use Illuminate\Http\JsonResponse;
 use Illuminate\Http\Request;
 use Illuminate\Http\Resources\Json\AnonymousResourceCollection;
@@ -44,6 +47,16 @@ final class AnnouncementController extends Controller
         } else {
             $announcement->likes()->create(['user_id' => $userId]);
             $liked = true;
+
+            if ((int) $announcement->author_id !== (int) $userId) {
+                UserNotification::create([
+                    'user_id' => $announcement->author_id,
+                    'type' => 'like',
+                    'title' => 'New like',
+                    'body' => ($request->user()->name ?? 'Someone').' liked your announcement: '.$announcement->title,
+                    'data' => ['announcement_id' => $announcement->id],
+                ]);
+            }
         }
 
         return response()->json([
@@ -60,6 +73,27 @@ final class AnnouncementController extends Controller
             'body' => $request->string('body')->toString(),
             'category' => $request->input('category', 'general'),
         ]);
+
+        if ($announcement->category === AnnouncementCategory::Advisory) {
+            $now = now();
+            $rows = User::query()
+                ->where('role', UserRole::Citizen->value)
+                ->pluck('id')
+                ->map(fn ($id): array => [
+                    'user_id' => $id,
+                    'type' => 'advisory',
+                    'title' => 'New advisory',
+                    'body' => $announcement->title,
+                    'data' => json_encode(['announcement_id' => $announcement->id]),
+                    'created_at' => $now,
+                    'updated_at' => $now,
+                ])
+                ->all();
+
+            if ($rows !== []) {
+                UserNotification::insert($rows);
+            }
+        }
 
         return new AnnouncementResource($announcement->load('author:id,name,role'));
     }

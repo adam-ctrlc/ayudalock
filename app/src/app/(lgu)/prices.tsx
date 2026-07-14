@@ -1,5 +1,5 @@
 import { useState } from "react";
-import { Alert, Pressable, View } from "react-native";
+import { Pressable, View } from "react-native";
 
 import { ApiError } from "@/lib/api/client";
 import type { PriceCategory } from "@/lib/api/prices";
@@ -15,6 +15,7 @@ import { Input } from "@/components/ui/input";
 import { Field } from "@/components/ui/field";
 import { Button } from "@/components/ui/button";
 import { Card, CardHeader, CardTitle } from "@/components/ui/card";
+import { useDialog } from "@/components/ui/dialog";
 import { Skeleton } from "@/components/ui/skeleton";
 
 const CATEGORIES: { key: PriceCategory; label: string }[] = [
@@ -27,6 +28,7 @@ export default function LguPrices() {
   const prices = usePrices("all");
   const create = useCreatePrice();
   const update = useUpdatePrice();
+  const dialog = useDialog();
 
   const [category, setCategory] = useState<PriceCategory>("fuel");
   const [name, setName] = useState("");
@@ -98,7 +100,7 @@ export default function LguPrices() {
             loading={create.isPending}
             onPress={() => {
               if (!name.trim() || !Number(value)) {
-                Alert.alert("Enter a name and a value.");
+                dialog.alert("Enter a name and a value.");
                 return;
               }
               create.mutate(
@@ -107,13 +109,17 @@ export default function LguPrices() {
                   onSuccess: () => {
                     setName("");
                     setValue("");
-                    Alert.alert("Added", "The new price is now live.");
+                    dialog.alert({
+                      title: "Added",
+                      message: "The new price is now live.",
+                    });
                   },
                   onError: (e) =>
-                    Alert.alert(
-                      "Could not add",
-                      e instanceof ApiError ? e.message : "Please try again.",
-                    ),
+                    dialog.alert({
+                      title: "Could not add",
+                      message:
+                        e instanceof ApiError ? e.message : "Please try again.",
+                    }),
                 },
               );
             }}
@@ -159,7 +165,7 @@ export default function LguPrices() {
                   onPress={() => {
                     const v = Number(edits[p.id]);
                     if (!v || v <= 0) {
-                      Alert.alert("Enter a new value.");
+                      dialog.alert("Enter a new value.");
                       return;
                     }
                     update.mutate(
@@ -172,12 +178,13 @@ export default function LguPrices() {
                             return next;
                           }),
                         onError: (e) =>
-                          Alert.alert(
-                            "Could not update",
-                            e instanceof ApiError
-                              ? e.message
-                              : "Please try again.",
-                          ),
+                          dialog.alert({
+                            title: "Could not update",
+                            message:
+                              e instanceof ApiError
+                                ? e.message
+                                : "Please try again.",
+                          }),
                       },
                     );
                   }}

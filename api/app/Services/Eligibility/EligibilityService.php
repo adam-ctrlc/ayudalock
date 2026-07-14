@@ -20,6 +20,8 @@ final class EligibilityService
                 return $this->hasBeneficiaryRecord($user);
             case ProgramType::Fuel:
                 return $this->hasFranchiseRecord($user);
+            default:
+                return false;
         }
     }
 

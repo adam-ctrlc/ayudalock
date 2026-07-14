@@ -1,10 +1,11 @@
 import { useState } from "react";
-import { Alert, Pressable, View } from "react-native";
+import { Pressable, View } from "react-native";
 
 import { ApiError } from "@/lib/api/client";
 import type { AnnouncementComment } from "@/lib/api/announcements";
 import { useAddComment, useComments } from "@/lib/queries/announcements";
 import { Text } from "@/components/ui/text";
+import { useDialog } from "@/components/ui/dialog";
 import { Input } from "@/components/ui/input";
 import { Button } from "@/components/ui/button";
 import { Skeleton } from "@/components/ui/skeleton";
@@ -47,15 +48,16 @@ function CommentItem({
 export function CommentsSection({ announcementId }: { announcementId: number }) {
   const comments = useComments(announcementId, true);
   const add = useAddComment(announcementId);
+  const dialog = useDialog();
   const [text, setText] = useState("");
   const [replyTo, setReplyTo] = useState<number | null>(null);
   const [replyText, setReplyText] = useState("");
 
   function onError(e: unknown) {
-    Alert.alert(
-      "Could not comment",
-      e instanceof ApiError ? e.message : "Please try again.",
-    );
+    dialog.alert({
+      title: "Could not comment",
+      message: e instanceof ApiError ? e.message : "Please try again.",
+    });
   }
 
   function submitTop() {

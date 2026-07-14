@@ -1,6 +1,7 @@
 import { useMemo, useState } from "react";
 import { Pressable, ScrollView, View } from "react-native";
-import { MagnifyingGlass, MapPin } from "phosphor-react-native";
+import { Link } from "expo-router";
+import { CaretRight, MagnifyingGlass, MapPin } from "phosphor-react-native";
 
 import type { PriceCategory } from "@/lib/api/prices";
 import { usePriceRegions, usePrices } from "@/lib/queries/prices";
@@ -126,26 +127,31 @@ export function PriceList() {
       ) : (
         <View className="gap-3">
           {items.map((price) => (
-            <Card key={price.id} className="flex-row items-center gap-3">
-              <View className="h-10 w-10 items-center justify-center rounded-xl bg-secondary">
-                <CategoryIcon category={price.category} />
-              </View>
-              <View className="flex-1 gap-0.5">
-                <Text variant="label">{price.name}</Text>
-                <Text variant="caption">
-                  {price.region} · {price.unit}
-                </Text>
-              </View>
-              <View className="items-end gap-0.5">
-                <Text className="text-lg font-bold">
-                  ₱{price.value.toFixed(2)}
-                </Text>
-                <TrendIndicator
-                  trend={price.trend}
-                  changePercent={price.change_percent}
-                />
-              </View>
-            </Card>
+            <Link key={price.id} href={`/prices/${price.id}`} asChild>
+              <Pressable className="active:opacity-80">
+                <Card className="flex-row items-center gap-3">
+                  <View className="h-10 w-10 items-center justify-center rounded-xl bg-secondary">
+                    <CategoryIcon category={price.category} />
+                  </View>
+                  <View className="flex-1 gap-0.5">
+                    <Text variant="label">{price.name}</Text>
+                    <Text variant="caption">
+                      {price.region} · {price.unit}
+                    </Text>
+                  </View>
+                  <View className="items-end gap-0.5">
+                    <Text className="text-lg font-bold">
+                      ₱{price.value.toFixed(2)}
+                    </Text>
+                    <TrendIndicator
+                      trend={price.trend}
+                      changePercent={price.change_percent}
+                    />
+                  </View>
+                  <CaretRight size={16} color={PH_COLORS.mutedForeground} />
+                </Card>
+              </Pressable>
+            </Link>
           ))}
         </View>
       )}

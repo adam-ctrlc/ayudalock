@@ -10,6 +10,7 @@ use App\Http\Requests\Announcement\StoreCommentRequest;
 use App\Http\Resources\AnnouncementCommentResource;
 use App\Models\Announcement;
 use App\Models\AnnouncementComment;
+use App\Models\UserNotification;
 use Illuminate\Http\JsonResponse;
 use Illuminate\Http\Request;
 use Illuminate\Http\Resources\Json\AnonymousResourceCollection;
@@ -53,6 +54,19 @@ final class AnnouncementCommentController extends Controller
             'parent_id' => $parentId,
             'body' => $request->string('body')->toString(),
         ]);
+
+        if ($parentId !== null) {
+            $parent = AnnouncementComment::query()->find($parentId);
+            if ($parent !== null && (int) $parent->user_id !== (int) $request->user()->getKey()) {
+                UserNotification::create([
+                    'user_id' => $parent->user_id,
+                    'type' => 'reply',
+                    'title' => 'New reply',
+                    'body' => ($request->user()->name ?? 'Someone').' replied to your comment.',
+                    'data' => ['announcement_id' => $announcement->id],
+                ]);
+            }
+        }
 
         return new AnnouncementCommentResource($comment->load('author:id,name,role'));
     }

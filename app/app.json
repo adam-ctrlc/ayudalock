@@ -9,7 +9,14 @@
     "plugins": [
       "expo-router",
       "expo-splash-screen",
-      "expo-secure-store"
+      "expo-secure-store",
+      [
+        "expo-camera",
+        {
+          "cameraPermission": "Allow AyudaLock to scan voucher QR codes."
+        }
+      ],
+      "@react-native-community/datetimepicker"
     ],
     "name": "app",
     "slug": "app"

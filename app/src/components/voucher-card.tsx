@@ -7,6 +7,14 @@ import { Text } from "@/components/ui/text";
 import { Badge } from "@/components/ui/badge";
 import { Button } from "@/components/ui/button";
 
+function formatExpiry(iso: string | null | undefined) {
+  if (!iso) return null;
+  return new Date(iso).toLocaleTimeString([], {
+    hour: "numeric",
+    minute: "2-digit",
+  });
+}
+
 type BadgeVariant =
   | "default"
   | "secondary"
@@ -33,6 +41,7 @@ export function VoucherCard({
 }) {
   const status = STATUS[allocation.status];
   const voucher = allocation.voucher;
+  const validUntil = formatExpiry(allocation.expires_at);
 
   return (
     <Card className="gap-3">
@@ -68,6 +77,9 @@ export function VoucherCard({
               {voucher.sms_code}
             </Text>
           </View>
+          {validUntil ? (
+            <Text variant="caption">Valid until {validUntil}</Text>
+          ) : null}
           <Text variant="caption" className="text-center">
             Show this QR or code to the merchant to claim your goods.
           </Text>
