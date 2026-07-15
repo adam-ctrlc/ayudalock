@@ -32,6 +32,7 @@ import { ClaimHistory } from "@/components/claim-history";
 import { MyVouchers } from "@/components/my-vouchers";
 import { ClaimRemindersList } from "@/components/claim-reminders-list";
 import { LeafletMap } from "@/components/leaflet-map";
+import { PriceList } from "@/components/price-list";
 
 function Step({ num, text }: { num: string; text: string }) {
   return (
@@ -44,6 +45,7 @@ function Step({ num, text }: { num: string; text: string }) {
   );
 }
 
+type Section = "claim" | "prices";
 type View2 = "available" | "saved" | "vouchers" | "history";
 
 const VIEW_LABELS: Record<View2, string> = {
@@ -60,6 +62,7 @@ export default function CitizenLocations() {
   const saveReminder = useCreateReminder();
   const dialog = useDialog();
   const params = useLocalSearchParams<{ view?: string }>();
+  const [section, setSection] = useState<Section>("claim");
   const [qty, setQty] = useState<Record<string, number>>({});
   const [view, setView] = useState<View2>(
     params.view === "saved" ? "saved" : "available",
@@ -178,14 +181,45 @@ export default function CitizenLocations() {
       onRefresh={() => locations.refetch()}
     >
       <View className="gap-0.5">
-        <Text variant="title">Claim relief</Text>
+        <Text variant="title">Relief & Prices</Text>
         <Text variant="subtitle">
-          Reserve your goods first, then just show a code at the store.
+          Reserve your goods, or check current prices near you.
         </Text>
       </View>
 
       <View className="flex-row gap-2">
-        {(["available", "saved", "vouchers", "history"] as View2[]).map((v) => {
+        {(["claim", "prices"] as Section[]).map((s) => {
+          const active = section === s;
+          return (
+            <Pressable
+              key={s}
+              onPress={() => setSection(s)}
+              className={cn(
+                "flex-1 items-center rounded-xl border py-2.5",
+                active
+                  ? "border-primary bg-primary"
+                  : "border-border bg-background",
+              )}
+            >
+              <Text
+                className={cn(
+                  "text-sm font-semibold",
+                  active ? "text-primary-foreground" : "text-foreground",
+                )}
+              >
+                {s === "claim" ? "Claim relief" : "Price Watch"}
+              </Text>
+            </Pressable>
+          );
+        })}
+      </View>
+
+      {section === "prices" ? (
+        <PriceList />
+      ) : (
+        <>
+          <View className="flex-row gap-2">
+            {(["available", "saved", "vouchers", "history"] as View2[]).map((v) => {
           const active = view === v;
           return (
             <Pressable
@@ -388,14 +422,16 @@ export default function CitizenLocations() {
         </>
       )}
 
-      {pending ? (
-        <DateTimePicker
-          value={new Date()}
-          mode="date"
-          minimumDate={new Date()}
-          onChange={onPickDate}
-        />
-      ) : null}
+          {pending ? (
+            <DateTimePicker
+              value={new Date()}
+              mode="date"
+              minimumDate={new Date()}
+              onChange={onPickDate}
+            />
+          ) : null}
+        </>
+      )}
     </Screen>
   );
 }

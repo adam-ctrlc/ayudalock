@@ -20,6 +20,8 @@ class DatabaseSeeder extends Seeder
             PriceReferenceSeeder::class,
             AnnouncementSeeder::class,
             ServiceGuideSeeder::class,
+            ProvinceSeeder::class,
+            HazardEventSeeder::class,
         ]);
     }
 }

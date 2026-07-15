@@ -1,5 +1,11 @@
 import { Tabs } from "expo-router";
-import { House, MapPin, Megaphone, Tag, User } from "phosphor-react-native";
+import {
+  House,
+  MapPin,
+  MapTrifold,
+  Megaphone,
+  User,
+} from "phosphor-react-native";
 
 import { RoleGate } from "@/components/role-gate";
 import { PH_COLORS } from "@/lib/theme";
@@ -30,18 +36,18 @@ export default function CitizenLayout() {
         <Tabs.Screen
           name="locations"
           options={{
-            tabBarLabel: "Claim",
+            tabBarLabel: "Relief",
             tabBarIcon: ({ focused, size }) => (
               <MapPin color={tabColor(focused)} size={size} />
             ),
           }}
         />
         <Tabs.Screen
-          name="prices"
+          name="impact"
           options={{
-            tabBarLabel: "Prices",
+            tabBarLabel: "Impact",
             tabBarIcon: ({ focused, size }) => (
-              <Tag color={tabColor(focused)} size={size} />
+              <MapTrifold color={tabColor(focused)} size={size} />
             ),
           }}
         />

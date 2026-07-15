@@ -9,6 +9,8 @@ use App\Http\Controllers\Api\AuthController;
 use App\Http\Controllers\Api\ClaimReminderController;
 use App\Http\Controllers\Api\DashboardController;
 use App\Http\Controllers\Api\EligibilityController;
+use App\Http\Controllers\Api\HazardEventController;
+use App\Http\Controllers\Api\HeatmapController;
 use App\Http\Controllers\Api\KeyController;
 use App\Http\Controllers\Api\LocationController;
 use App\Http\Controllers\Api\NotificationController;
@@ -16,6 +18,7 @@ use App\Http\Controllers\Api\PriceController;
 use App\Http\Controllers\Api\ProfileController;
 use App\Http\Controllers\Api\RedemptionController;
 use App\Http\Controllers\Api\ServiceGuideController;
+use App\Http\Controllers\Api\WeatherController;
 use Illuminate\Support\Facades\Route;
 
 Route::prefix('auth')->group(function (): void {
@@ -40,6 +43,13 @@ Route::get('prices/{price}/history', [PriceController::class, 'history']);
 
 Route::get('guides', [ServiceGuideController::class, 'index']);
 Route::get('guides/{guide}', [ServiceGuideController::class, 'show']);
+
+Route::get('heatmap/provinces', [HeatmapController::class, 'provinces']);
+Route::get('heatmap/provinces/{code}', [HeatmapController::class, 'province']);
+Route::get('heatmap/weather', [WeatherController::class, 'provinces']);
+Route::get('heatmap/weather/list', [WeatherController::class, 'list']);
+Route::get('hazards', [HazardEventController::class, 'index']);
+Route::match(['get', 'post'], 'internal/hazards/refresh', [HazardEventController::class, 'refresh']);
 
 Route::middleware('auth:api')->group(function (): void {
     Route::get('locations', [LocationController::class, 'index']);
@@ -87,5 +97,8 @@ Route::middleware('auth:api')->group(function (): void {
         Route::post('guides', [ServiceGuideController::class, 'store']);
         Route::put('guides/{guide}', [ServiceGuideController::class, 'update']);
         Route::delete('guides/{guide}', [ServiceGuideController::class, 'destroy']);
+
+        Route::post('hazards', [HazardEventController::class, 'store']);
+        Route::delete('hazards/{hazard}', [HazardEventController::class, 'destroy']);
     });
 });

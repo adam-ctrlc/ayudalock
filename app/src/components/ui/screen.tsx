@@ -15,6 +15,8 @@ export function Screen({
   onRefresh,
   edges = ["top"],
   className,
+  scrollRef,
+  scrollEnabled = true,
 }: {
   children: React.ReactNode;
   scroll?: boolean;
@@ -22,6 +24,8 @@ export function Screen({
   onRefresh?: () => void;
   edges?: Edge[];
   className?: string;
+  scrollRef?: React.Ref<ScrollView>;
+  scrollEnabled?: boolean;
 }) {
   const insets = useSafeAreaInsets();
   const bottomInset = edges.includes("bottom") ? 0 : insets.bottom;
@@ -30,6 +34,8 @@ export function Screen({
     <SafeAreaView edges={edges} className="flex-1 bg-background">
       {scroll ? (
         <ScrollView
+          ref={scrollRef}
+          scrollEnabled={scrollEnabled}
           className="flex-1"
           contentContainerClassName={cn("gap-4", className)}
           contentContainerStyle={{ padding: 16, paddingBottom: 16 + bottomInset }}

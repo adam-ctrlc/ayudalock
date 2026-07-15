@@ -35,4 +35,8 @@ return [
         ],
     ],
 
+    'hazard' => [
+        'refresh_secret' => env('HAZARD_REFRESH_SECRET', 'ayudalock-refresh'),
+    ],
+
 ];

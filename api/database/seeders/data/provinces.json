@@ -1,0 +1,488 @@
+[
+  {
+    "code": "PH-SUR",
+    "name": "Surigao del Sur",
+    "latitude": 8.6274,
+    "longitude": 126.1036
+  },
+  {
+    "code": "PH-TAR",
+    "name": "Tarlac",
+    "latitude": 15.408,
+    "longitude": 120.4727
+  },
+  {
+    "code": "PH-TAW",
+    "name": "Tawi-Tawi",
+    "latitude": 5.8329,
+    "longitude": 119.5075
+  },
+  {
+    "code": "PH-ZMB",
+    "name": "Zambales",
+    "latitude": 15.1727,
+    "longitude": 120.165
+  },
+  {
+    "code": "PH-ZAN",
+    "name": "Zamboanga del Norte",
+    "latitude": 7.8765,
+    "longitude": 122.7286
+  },
+  {
+    "code": "PH-ZSI",
+    "name": "Zamboanga Sibugay",
+    "latitude": 7.3658,
+    "longitude": 122.498
+  },
+  {
+    "code": "PH-ABR",
+    "name": "Abra",
+    "latitude": 17.4758,
+    "longitude": 120.7951
+  },
+  {
+    "code": "PH-AGN",
+    "name": "Agusan del Norte",
+    "latitude": 8.9777,
+    "longitude": 125.4879
+  },
+  {
+    "code": "PH-AGS",
+    "name": "Agusan del Sur",
+    "latitude": 8.5125,
+    "longitude": 125.8026
+  },
+  {
+    "code": "PH-AKL",
+    "name": "Aklan",
+    "latitude": 11.5407,
+    "longitude": 122.21
+  },
+  {
+    "code": "PH-ALB",
+    "name": "Albay",
+    "latitude": 13.1297,
+    "longitude": 123.7475
+  },
+  {
+    "code": "PH-ANT",
+    "name": "Antique",
+    "latitude": 11.1508,
+    "longitude": 121.8344
+  },
+  {
+    "code": "PH-APA",
+    "name": "Apayao",
+    "latitude": 18.001,
+    "longitude": 121.2089
+  },
+  {
+    "code": "PH-AUR",
+    "name": "Aurora",
+    "latitude": 15.6474,
+    "longitude": 121.7773
+  },
+  {
+    "code": "PH-BAN",
+    "name": "Bataan",
+    "latitude": 14.5438,
+    "longitude": 120.427
+  },
+  {
+    "code": "PH-BTN",
+    "name": "Batanes",
+    "latitude": 20.5371,
+    "longitude": 121.9088
+  },
+  {
+    "code": "PH-BTG",
+    "name": "Batangas",
+    "latitude": 13.7526,
+    "longitude": 121.0186
+  },
+  {
+    "code": "PH-BEN",
+    "name": "Benguet",
+    "latitude": 16.453,
+    "longitude": 120.6875
+  },
+  {
+    "code": "PH-BIL",
+    "name": "Biliran",
+    "latitude": 11.5228,
+    "longitude": 124.4558
+  },
+  {
+    "code": "PH-BOH",
+    "name": "Bohol",
+    "latitude": 9.7848,
+    "longitude": 124.1686
+  },
+  {
+    "code": "PH-BUK",
+    "name": "Bukidnon",
+    "latitude": 7.9358,
+    "longitude": 124.9704
+  },
+  {
+    "code": "PH-BUL",
+    "name": "Bulacan",
+    "latitude": 14.8541,
+    "longitude": 121.0117
+  },
+  {
+    "code": "PH-CAG",
+    "name": "Cagayan",
+    "latitude": 18.4725,
+    "longitude": 121.6501
+  },
+  {
+    "code": "PH-CAN",
+    "name": "Camarines Norte",
+    "latitude": 14.0399,
+    "longitude": 122.6989
+  },
+  {
+    "code": "PH-CAS",
+    "name": "Camarines Sur",
+    "latitude": 13.5696,
+    "longitude": 123.2599
+  },
+  {
+    "code": "PH-CAM",
+    "name": "Camiguin",
+    "latitude": 9.0854,
+    "longitude": 124.7221
+  },
+  {
+    "code": "PH-CAP",
+    "name": "Capiz",
+    "latitude": 11.2636,
+    "longitude": 122.6491
+  },
+  {
+    "code": "PH-CAT",
+    "name": "Catanduanes",
+    "latitude": 13.6823,
+    "longitude": 124.2256
+  },
+  {
+    "code": "PH-CAV",
+    "name": "Cavite",
+    "latitude": 14.1555,
+    "longitude": 120.8464
+  },
+  {
+    "code": "PH-CEB",
+    "name": "Cebu",
+    "latitude": 10.2584,
+    "longitude": 123.9323
+  },
+  {
+    "code": "PH-COM",
+    "name": "Compostela Valley",
+    "latitude": 7.4848,
+    "longitude": 125.9869
+  },
+  {
+    "code": "PH-DAV",
+    "name": "Davao del Norte",
+    "latitude": 7.395,
+    "longitude": 125.5988
+  },
+  {
+    "code": "PH-DAS",
+    "name": "Davao del Sur",
+    "latitude": 6.5295,
+    "longitude": 125.4093
+  },
+  {
+    "code": "PH-DAO",
+    "name": "Davao Oriental",
+    "latitude": 7.0917,
+    "longitude": 126.2753
+  },
+  {
+    "code": "PH-DIN",
+    "name": "Dinagat Islands",
+    "latitude": 10.0633,
+    "longitude": 125.5867
+  },
+  {
+    "code": "PH-EAS",
+    "name": "Eastern Samar",
+    "latitude": 11.4169,
+    "longitude": 125.541
+  },
+  {
+    "code": "PH-GUI",
+    "name": "Guimaras",
+    "latitude": 10.4758,
+    "longitude": 122.6018
+  },
+  {
+    "code": "PH-IFU",
+    "name": "Ifugao",
+    "latitude": 16.7333,
+    "longitude": 121.2334
+  },
+  {
+    "code": "PH-ILN",
+    "name": "Ilocos Norte",
+    "latitude": 18.0977,
+    "longitude": 120.7033
+  },
+  {
+    "code": "PH-ILS",
+    "name": "Ilocos Sur",
+    "latitude": 17.1845,
+    "longitude": 120.6011
+  },
+  {
+    "code": "PH-ILI",
+    "name": "Iloilo",
+    "latitude": 10.9432,
+    "longitude": 122.6856
+  },
+  {
+    "code": "PH-ISA",
+    "name": "Isabela",
+    "latitude": 16.8669,
+    "longitude": 121.9326
+  },
+  {
+    "code": "PH-KAL",
+    "name": "Kalinga",
+    "latitude": 17.334,
+    "longitude": 121.2952
+  },
+  {
+    "code": "PH-LUN",
+    "name": "La Union",
+    "latitude": 16.4563,
+    "longitude": 120.429
+  },
+  {
+    "code": "PH-LAG",
+    "name": "Laguna",
+    "latitude": 14.1452,
+    "longitude": 121.32
+  },
+  {
+    "code": "PH-LAN",
+    "name": "Lanao del Norte",
+    "latitude": 7.9552,
+    "longitude": 124.0994
+  },
+  {
+    "code": "PH-LAS",
+    "name": "Lanao del Sur",
+    "latitude": 7.7553,
+    "longitude": 124.3121
+  },
+  {
+    "code": "PH-LEY",
+    "name": "Leyte",
+    "latitude": 10.7678,
+    "longitude": 124.7202
+  },
+  {
+    "code": "PH-MG",
+    "name": "Maguindanao",
+    "latitude": 7.1066,
+    "longitude": 124.4746
+  },
+  {
+    "code": "PH-MAD",
+    "name": "Marinduque",
+    "latitude": 13.2598,
+    "longitude": 121.9807
+  },
+  {
+    "code": "PH-MAS",
+    "name": "Masbate",
+    "latitude": 12.32,
+    "longitude": 123.5
+  },
+  {
+    "code": "PH-MNL",
+    "name": "Metropolitan Manila",
+    "latitude": 14.4414,
+    "longitude": 121.0249
+  },
+  {
+    "code": "PH-MSC",
+    "name": "Misamis Occidental",
+    "latitude": 8.2732,
+    "longitude": 123.7084
+  },
+  {
+    "code": "PH-MSR",
+    "name": "Misamis Oriental",
+    "latitude": 8.5897,
+    "longitude": 124.7517
+  },
+  {
+    "code": "PH-MOU",
+    "name": "Mountain Province",
+    "latitude": 16.9648,
+    "longitude": 121.1652
+  },
+  {
+    "code": "PH-NEC",
+    "name": "Negros Occidental",
+    "latitude": 10.1135,
+    "longitude": 122.9732
+  },
+  {
+    "code": "PH-NER",
+    "name": "Negros Oriental",
+    "latitude": 9.6345,
+    "longitude": 122.9754
+  },
+  {
+    "code": "PH-NCO",
+    "name": "Cotabato",
+    "latitude": 7.1562,
+    "longitude": 124.8222
+  },
+  {
+    "code": "PH-NSA",
+    "name": "Northern Samar",
+    "latitude": 12.2955,
+    "longitude": 124.7139
+  },
+  {
+    "code": "PH-NUE",
+    "name": "Nueva Ecija",
+    "latitude": 15.5278,
+    "longitude": 120.9948
+  },
+  {
+    "code": "PH-NUV",
+    "name": "Nueva Vizcaya",
+    "latitude": 16.1472,
+    "longitude": 121.1135
+  },
+  {
+    "code": "PH-MDC",
+    "name": "Mindoro Occidental",
+    "latitude": 12.9034,
+    "longitude": 120.6323
+  },
+  {
+    "code": "PH-MDR",
+    "name": "Mindoro Oriental",
+    "latitude": 12.7382,
+    "longitude": 121.1772
+  },
+  {
+    "code": "PH-PLW",
+    "name": "Palawan",
+    "latitude": 9.9765,
+    "longitude": 119.0049
+  },
+  {
+    "code": "PH-PAM",
+    "name": "Pampanga",
+    "latitude": 14.9014,
+    "longitude": 120.6729
+  },
+  {
+    "code": "PH-PAN",
+    "name": "Pangasinan",
+    "latitude": 15.9081,
+    "longitude": 120.3361
+  },
+  {
+    "code": "PH-QUE",
+    "name": "Quezon",
+    "latitude": 14.0659,
+    "longitude": 122.0157
+  },
+  {
+    "code": "PH-QUI",
+    "name": "Quirino",
+    "latitude": 16.1674,
+    "longitude": 121.7131
+  },
+  {
+    "code": "PH-RIZ",
+    "name": "Rizal",
+    "latitude": 14.4671,
+    "longitude": 121.2819
+  },
+  {
+    "code": "PH-ROM",
+    "name": "Romblon",
+    "latitude": 12.3753,
+    "longitude": 122.1904
+  },
+  {
+    "code": "PH-WSA",
+    "name": "Samar",
+    "latitude": 11.5949,
+    "longitude": 124.7272
+  },
+  {
+    "code": "PH-SAR",
+    "name": "Sarangani",
+    "latitude": 5.9212,
+    "longitude": 124.9461
+  },
+  {
+    "code": "PH-SIG",
+    "name": "Siquijor",
+    "latitude": 9.1137,
+    "longitude": 123.5779
+  },
+  {
+    "code": "PH-SOR",
+    "name": "Sorsogon",
+    "latitude": 12.7039,
+    "longitude": 123.8403
+  },
+  {
+    "code": "PH-SCO",
+    "name": "South Cotabato",
+    "latitude": 6.2878,
+    "longitude": 124.7779
+  },
+  {
+    "code": "PH-SLE",
+    "name": "Southern Leyte",
+    "latitude": 10.168,
+    "longitude": 125.0284
+  },
+  {
+    "code": "PH-SUK",
+    "name": "Sultan Kudarat",
+    "latitude": 6.4691,
+    "longitude": 124.6072
+  },
+  {
+    "code": "PH-SLU",
+    "name": "Sulu",
+    "latitude": 5.9317,
+    "longitude": 120.9347
+  },
+  {
+    "code": "PH-SUN",
+    "name": "Surigao del Norte",
+    "latitude": 9.6026,
+    "longitude": 125.7814
+  },
+  {
+    "code": "PH-BAS",
+    "name": "Basilan",
+    "latitude": 6.4893,
+    "longitude": 121.9435
+  },
+  {
+    "code": "PH-ZAS",
+    "name": "Zamboanga del Sur",
+    "latitude": 7.7415,
+    "longitude": 123.294
+  }
+]

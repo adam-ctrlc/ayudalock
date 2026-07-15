@@ -6,6 +6,9 @@ export const qk = {
   prices: ["prices"] as const,
   guides: ["guides"] as const,
   notifications: ["notifications"] as const,
+  impactMap: ["impact-map"] as const,
+  hazards: ["hazards"] as const,
+  weather: ["weather"] as const,
   stats: ["stats"] as const,
   heatmap: ["heatmap"] as const,
 };
