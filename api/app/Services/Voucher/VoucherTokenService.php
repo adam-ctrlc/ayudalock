@@ -94,6 +94,22 @@ final class VoucherTokenService
         return File::get($this->keyDirectory.'/public.pem');
     }
 
+    /**
+     * @return array{kty: string, alg: string, use: string, n: string, e: string}
+     */
+    public function publicKeyJwk(): array
+    {
+        $details = openssl_pkey_get_details($this->publicKey());
+
+        return [
+            'kty' => 'RSA',
+            'alg' => 'RS256',
+            'use' => 'sig',
+            'n' => $this->base64UrlEncode($details['rsa']['n']),
+            'e' => $this->base64UrlEncode($details['rsa']['e']),
+        ];
+    }
+
     private function generateSmsCode(): string
     {
         return str_pad((string) random_int(0, 999999), 6, '0', STR_PAD_LEFT);

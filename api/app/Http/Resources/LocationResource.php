@@ -27,6 +27,9 @@ final class LocationResource extends JsonResource
             'latitude' => $this->latitude,
             'longitude' => $this->longitude,
             'is_active' => $this->is_active,
+            'has_generator' => (bool) $this->has_generator,
+            'power_status' => $this->power_status?->value,
+            'power_status_updated_at' => $this->power_status_updated_at?->toIso8601String(),
             'inventories' => InventoryResource::collection($this->whenLoaded('inventories')),
         ];
     }

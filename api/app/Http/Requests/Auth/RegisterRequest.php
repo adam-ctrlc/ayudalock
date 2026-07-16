@@ -26,7 +26,7 @@ final class RegisterRequest extends FormRequest
             'username' => ['nullable', 'string', 'max:255', 'alpha_dash', 'unique:users,username'],
             'email' => ['required', 'email', 'max:255', 'unique:users,email'],
             'password' => ['required', 'string', 'confirmed', Password::min(8)],
-            'role' => ['required', Rule::enum(UserRole::class)],
+            'role' => ['required', Rule::enum(UserRole::class)->only([UserRole::Citizen, UserRole::Merchant])],
             'phil_sys_id' => ['nullable', 'string', 'max:255', 'unique:users,phil_sys_id'],
             'phone' => ['nullable', 'string', 'max:32'],
             'barangay_id' => ['nullable', 'integer', 'exists:barangays,id'],

@@ -5,6 +5,7 @@ declare(strict_types=1);
 namespace App\Models;
 
 use App\Enums\LocationType;
+use App\Enums\PowerStatus;
 use Illuminate\Database\Eloquent\Factories\HasFactory;
 use Illuminate\Database\Eloquent\Model;
 use Illuminate\Database\Eloquent\Relations\BelongsTo;
@@ -21,6 +22,9 @@ final class Location extends Model
         'latitude',
         'longitude',
         'is_active',
+        'has_generator',
+        'power_status',
+        'power_status_updated_at',
     ];
 
     protected function casts(): array
@@ -30,6 +34,9 @@ final class Location extends Model
             'latitude' => 'decimal:7',
             'longitude' => 'decimal:7',
             'is_active' => 'boolean',
+            'has_generator' => 'boolean',
+            'power_status' => PowerStatus::class,
+            'power_status_updated_at' => 'datetime',
         ];
     }
 

@@ -22,6 +22,8 @@ class DatabaseSeeder extends Seeder
             ServiceGuideSeeder::class,
             ProvinceSeeder::class,
             HazardEventSeeder::class,
+            GridStatusSeeder::class,
+            PowerInterruptionSeeder::class,
         ]);
     }
 }

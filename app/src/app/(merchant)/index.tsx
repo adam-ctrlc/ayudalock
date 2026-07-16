@@ -14,6 +14,7 @@ import { Button } from "@/components/ui/button";
 import { Card } from "@/components/ui/card";
 import { Badge } from "@/components/ui/badge";
 import { NotificationBell } from "@/components/notification-bell";
+import { GridAlertBanner } from "@/components/energy/grid-alert-banner";
 
 type Mode = "scan" | "sms" | "token";
 
@@ -88,6 +89,8 @@ export default function MerchantRedeem() {
         </View>
         <NotificationBell />
       </View>
+
+      <GridAlertBanner />
 
       <View className="flex-row gap-2">
         {(["scan", "sms", "token"] as Mode[]).map((m) => {

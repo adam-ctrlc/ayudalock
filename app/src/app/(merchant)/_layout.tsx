@@ -2,6 +2,7 @@ import { Tabs } from "expo-router";
 import { CloudArrowUp, Megaphone, QrCode, User } from "phosphor-react-native";
 
 import { RoleGate } from "@/components/role-gate";
+import { useVoucherKey } from "@/lib/queries/voucher-key";
 import { PH_COLORS } from "@/lib/theme";
 
 function tabColor(focused: boolean) {
@@ -9,6 +10,8 @@ function tabColor(focused: boolean) {
 }
 
 export default function MerchantLayout() {
+  useVoucherKey();
+
   return (
     <RoleGate role="merchant">
       <Tabs

@@ -1,5 +1,6 @@
 import { apiRequest } from "@/lib/api/client";
 import type { Commodity } from "@/lib/api/eligibility";
+import type { PowerStatus } from "@/lib/api/energy";
 
 export type LocationType = "kadiwa_store" | "gas_station";
 
@@ -19,6 +20,9 @@ export type Location = {
   latitude: string | null;
   longitude: string | null;
   is_active: boolean;
+  has_generator: boolean;
+  power_status: PowerStatus | null;
+  power_status_updated_at: string | null;
   inventories?: Inventory[];
 };
 

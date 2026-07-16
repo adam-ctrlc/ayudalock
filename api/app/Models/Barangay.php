@@ -6,6 +6,7 @@ namespace App\Models;
 
 use Illuminate\Database\Eloquent\Factories\HasFactory;
 use Illuminate\Database\Eloquent\Model;
+use Illuminate\Database\Eloquent\Relations\BelongsTo;
 use Illuminate\Database\Eloquent\Relations\HasMany;
 
 final class Barangay extends Model
@@ -15,6 +16,7 @@ final class Barangay extends Model
     protected $fillable = [
         'name',
         'city',
+        'province_code',
         'latitude',
         'longitude',
     ];
@@ -25,6 +27,11 @@ final class Barangay extends Model
             'latitude' => 'decimal:7',
             'longitude' => 'decimal:7',
         ];
+    }
+
+    public function province(): BelongsTo
+    {
+        return $this->belongsTo(Province::class, 'province_code', 'code');
     }
 
     public function locations(): HasMany

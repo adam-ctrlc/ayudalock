@@ -19,7 +19,6 @@ import { TextLink } from "@/components/ui/text-link";
 const ROLES: { key: UserRole; label: string }[] = [
   { key: "citizen", label: "Citizen" },
   { key: "merchant", label: "Merchant" },
-  { key: "lgu_admin", label: "LGU" },
 ];
 
 export default function Register() {

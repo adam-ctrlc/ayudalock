@@ -13,6 +13,7 @@ use App\Models\Location;
 use App\Models\User;
 use App\Models\Voucher;
 use App\Services\Eligibility\EligibilityService;
+use App\Services\Energy\EnergyImpactService;
 use App\Services\Voucher\VoucherTokenService;
 use Illuminate\Support\Carbon;
 use Illuminate\Support\Facades\DB;
@@ -22,6 +23,7 @@ final class AllocationService
     public function __construct(
         private readonly EligibilityService $eligibility,
         private readonly VoucherTokenService $voucherToken,
+        private readonly EnergyImpactService $energyImpact,
     ) {}
 
     public function createLock(User $user, Location $location, Commodity $commodity, float $quantity): Allocation
@@ -39,6 +41,8 @@ final class AllocationService
         if (! $this->eligibility->isEligibleFor($user, $program)) {
             throw new DomainException('You are not eligible for this program.', 403);
         }
+
+        $this->assertLocationPowered($location);
 
         $cap = (float) $program->per_beneficiary_cap;
         $alreadyHeld = $this->quantityHeldByUser($user, (int) $program->getKey());
@@ -126,6 +130,21 @@ final class AllocationService
         }
 
         return $count;
+    }
+
+    private function assertLocationPowered(Location $location): void
+    {
+        if ($location->power_status === null || $location->power_status->canServe()) {
+            return;
+        }
+
+        $alternative = $this->energyImpact->resilientAlternatives($location, 1)->first();
+
+        $message = $alternative === null
+            ? "{$location->name} is offline due to a power interruption. No powered service point is available nearby right now."
+            : "{$location->name} is offline due to a power interruption. Nearest service point with power: {$alternative->name}.";
+
+        throw new DomainException($message);
     }
 
     private function releaseInventory(Allocation $allocation): void

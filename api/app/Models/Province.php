@@ -4,6 +4,7 @@ declare(strict_types=1);
 
 namespace App\Models;
 
+use App\Enums\GridIsland;
 use Illuminate\Database\Eloquent\Model;
 
 final class Province extends Model
@@ -12,6 +13,7 @@ final class Province extends Model
         'code',
         'name',
         'region',
+        'grid',
         'latitude',
         'longitude',
         'population',
@@ -26,6 +28,7 @@ final class Province extends Model
     protected function casts(): array
     {
         return [
+            'grid' => GridIsland::class,
             'latitude' => 'float',
             'longitude' => 'float',
             'population' => 'integer',

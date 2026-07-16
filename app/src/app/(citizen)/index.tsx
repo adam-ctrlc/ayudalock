@@ -21,6 +21,7 @@ import { Badge } from "@/components/ui/badge";
 import { Skeleton } from "@/components/ui/skeleton";
 import { MarketSnapshot } from "@/components/market-snapshot";
 import { LatestAlerts } from "@/components/latest-alerts";
+import { GridAlertBanner } from "@/components/energy/grid-alert-banner";
 import { NotificationBell } from "@/components/notification-bell";
 
 function QuickAction({
@@ -83,6 +84,8 @@ export default function CitizenHome() {
         <NotificationBell />
       </View>
 
+      <GridAlertBanner />
+
       {dueCount > 0 ? (
         <Link href="/(citizen)/locations?view=saved" asChild>
           <Pressable className="active:opacity-90">
@@ -136,7 +139,7 @@ export default function CitizenHome() {
           icon={<Basket size={22} color={PH_COLORS.blue} weight="duotone" />}
         />
         <QuickAction
-          href="/(citizen)/prices"
+          href="/(citizen)/locations?view=prices"
           title="Price Watch"
           subtitle="Fuel, fare, market"
           icon={<Tag size={22} color={PH_COLORS.blue} weight="duotone" />}

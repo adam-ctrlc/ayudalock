@@ -19,6 +19,7 @@ final class KeyController extends Controller
         return response()->json([
             'algorithm' => 'RSA-SHA256',
             'public_key' => $this->voucherToken->publicKeyPem(),
+            'jwk' => $this->voucherToken->publicKeyJwk(),
         ]);
     }
 }

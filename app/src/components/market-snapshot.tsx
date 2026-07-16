@@ -48,7 +48,7 @@ export function MarketSnapshot() {
     <>
       <View className="flex-row items-center justify-between">
         <Text variant="heading">Market snapshot</Text>
-        <Link href="/(citizen)/prices" asChild>
+        <Link href="/(citizen)/locations?view=prices" asChild>
           <Pressable hitSlop={8} className="active:opacity-60">
             <Text variant="caption" className="font-medium text-primary">
               See all

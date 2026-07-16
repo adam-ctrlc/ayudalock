@@ -1,4 +1,4 @@
-export type HeatMetric = "affected" | "severity" | "rainfall";
+export type HeatMetric = "affected" | "severity" | "rainfall" | "outage";
 
 export const NO_DATA_COLOR = "#e5e9f0";
 

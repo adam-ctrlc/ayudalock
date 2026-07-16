@@ -9,11 +9,13 @@ use App\Http\Controllers\Api\AuthController;
 use App\Http\Controllers\Api\ClaimReminderController;
 use App\Http\Controllers\Api\DashboardController;
 use App\Http\Controllers\Api\EligibilityController;
+use App\Http\Controllers\Api\GridStatusController;
 use App\Http\Controllers\Api\HazardEventController;
 use App\Http\Controllers\Api\HeatmapController;
 use App\Http\Controllers\Api\KeyController;
 use App\Http\Controllers\Api\LocationController;
 use App\Http\Controllers\Api\NotificationController;
+use App\Http\Controllers\Api\PowerInterruptionController;
 use App\Http\Controllers\Api\PriceController;
 use App\Http\Controllers\Api\ProfileController;
 use App\Http\Controllers\Api\RedemptionController;
@@ -50,6 +52,10 @@ Route::get('heatmap/weather', [WeatherController::class, 'provinces']);
 Route::get('heatmap/weather/list', [WeatherController::class, 'list']);
 Route::get('hazards', [HazardEventController::class, 'index']);
 Route::match(['get', 'post'], 'internal/hazards/refresh', [HazardEventController::class, 'refresh']);
+
+Route::get('energy/grid', [GridStatusController::class, 'index']);
+Route::get('energy/interruptions', [PowerInterruptionController::class, 'index']);
+Route::get('heatmap/outages', [PowerInterruptionController::class, 'heatmap']);
 
 Route::middleware('auth:api')->group(function (): void {
     Route::get('locations', [LocationController::class, 'index']);
@@ -100,5 +106,10 @@ Route::middleware('auth:api')->group(function (): void {
 
         Route::post('hazards', [HazardEventController::class, 'store']);
         Route::delete('hazards/{hazard}', [HazardEventController::class, 'destroy']);
+
+        Route::post('energy/grid', [GridStatusController::class, 'store']);
+        Route::post('energy/interruptions', [PowerInterruptionController::class, 'store']);
+        Route::put('energy/interruptions/{interruption}', [PowerInterruptionController::class, 'update']);
+        Route::delete('energy/interruptions/{interruption}', [PowerInterruptionController::class, 'destroy']);
     });
 });

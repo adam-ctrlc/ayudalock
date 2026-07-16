@@ -2,6 +2,7 @@ import { Tabs } from "expo-router";
 import {
   BookOpen,
   ChartBar,
+  Lightning,
   Megaphone,
   Tag,
   User,
@@ -67,6 +68,15 @@ export default function LguLayout() {
             tabBarLabel: "Hazards",
             tabBarIcon: ({ focused, size }) => (
               <Warning color={tabColor(focused)} size={size} />
+            ),
+          }}
+        />
+        <Tabs.Screen
+          name="energy"
+          options={{
+            tabBarLabel: "Power",
+            tabBarIcon: ({ focused, size }) => (
+              <Lightning color={tabColor(focused)} size={size} />
             ),
           }}
         />

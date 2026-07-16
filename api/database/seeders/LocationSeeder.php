@@ -29,6 +29,9 @@ final class LocationSeeder extends Seeder
                 ],
             );
 
+            $kadiwa->has_generator = $barangay->name === 'Barangay Bagong Silang';
+            $kadiwa->save();
+
             Inventory::query()->firstOrCreate(
                 ['location_id' => $kadiwa->id, 'commodity_id' => $rice->id],
                 ['quantity_available' => 500, 'quantity_locked' => 0],

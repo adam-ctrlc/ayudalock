@@ -13,6 +13,7 @@ import {
 
 import { ApiError } from "@/lib/api/client";
 import type { Inventory, Location } from "@/lib/api/locations";
+import type { PowerStatus } from "@/lib/api/energy";
 import { useLocations } from "@/lib/queries/locations";
 import { useEligibility } from "@/lib/queries/eligibility";
 import { useCreateAllocation } from "@/lib/queries/allocations";
@@ -33,6 +34,7 @@ import { MyVouchers } from "@/components/my-vouchers";
 import { ClaimRemindersList } from "@/components/claim-reminders-list";
 import { LeafletMap } from "@/components/leaflet-map";
 import { PriceList } from "@/components/price-list";
+import { GridAlertBanner } from "@/components/energy/grid-alert-banner";
 
 function Step({ num, text }: { num: string; text: string }) {
   return (
@@ -55,6 +57,50 @@ const VIEW_LABELS: Record<View2, string> = {
   history: "History",
 };
 
+function powerColor(status: PowerStatus | null | undefined): string {
+  switch (status) {
+    case "offline":
+      return PH_COLORS.red;
+    case "generator":
+      return PH_COLORS.yellow;
+    default:
+      return PH_COLORS.success;
+  }
+}
+
+function powerLabel(status: PowerStatus | null | undefined): string {
+  switch (status) {
+    case "offline":
+      return "No power";
+    case "generator":
+      return "Generator";
+    default:
+      return "Open";
+  }
+}
+
+function initialSection(view?: string): Section {
+  switch (view) {
+    case "prices":
+      return "prices";
+    default:
+      return "claim";
+  }
+}
+
+function initialView(view?: string): View2 {
+  switch (view) {
+    case "saved":
+      return "saved";
+    case "vouchers":
+      return "vouchers";
+    case "history":
+      return "history";
+    default:
+      return "available";
+  }
+}
+
 export default function CitizenLocations() {
   const eligibility = useEligibility();
   const locations = useLocations();
@@ -62,11 +108,9 @@ export default function CitizenLocations() {
   const saveReminder = useCreateReminder();
   const dialog = useDialog();
   const params = useLocalSearchParams<{ view?: string }>();
-  const [section, setSection] = useState<Section>("claim");
+  const [section, setSection] = useState<Section>(initialSection(params.view));
   const [qty, setQty] = useState<Record<string, number>>({});
-  const [view, setView] = useState<View2>(
-    params.view === "saved" ? "saved" : "available",
-  );
+  const [view, setView] = useState<View2>(initialView(params.view));
   const [pending, setPending] = useState<{
     locationId: number;
     commodityId: number;
@@ -186,6 +230,8 @@ export default function CitizenLocations() {
           Reserve your goods, or check current prices near you.
         </Text>
       </View>
+
+      <GridAlertBanner />
 
       <View className="flex-row gap-2">
         {(["claim", "prices"] as Section[]).map((s) => {
@@ -316,16 +362,35 @@ export default function CitizenLocations() {
                     <View className="flex-row items-center gap-1.5">
                       <View
                         className="h-2 w-2 rounded-full"
-                        style={{ backgroundColor: PH_COLORS.success }}
+                        style={{ backgroundColor: powerColor(loc.power_status) }}
                       />
                       <Text
                         className="text-xs font-semibold"
-                        style={{ color: PH_COLORS.success }}
+                        style={{ color: powerColor(loc.power_status) }}
                       >
-                        Open
+                        {powerLabel(loc.power_status)}
                       </Text>
                     </View>
                   </View>
+
+                  {loc.power_status === "offline" ? (
+                    <View className="rounded-xl bg-secondary p-3">
+                      <Text variant="caption">
+                        This service point has no power right now because of an
+                        interruption. Claiming is paused here. Pick another site
+                        below so you do not waste the fare.
+                      </Text>
+                    </View>
+                  ) : null}
+
+                  {loc.power_status === "generator" ? (
+                    <View className="rounded-xl bg-secondary p-3">
+                      <Text variant="caption">
+                        Running on backup generator during the brownout. Claiming
+                        is still open here.
+                      </Text>
+                    </View>
+                  ) : null}
 
                   <View>
                     {items.map((inv, idx) => {
@@ -392,7 +457,12 @@ export default function CitizenLocations() {
 
                           <Button
                             variant="success"
-                            label={`Claim ${value} ${unitLabel(unit)}`}
+                            label={
+                              loc.power_status === "offline"
+                                ? "Unavailable during brownout"
+                                : `Claim ${value} ${unitLabel(unit)}`
+                            }
+                            disabled={loc.power_status === "offline"}
                             loading={claimingThis}
                             onPress={() =>
                               onClaim(loc.id, inv.commodity_id, value)

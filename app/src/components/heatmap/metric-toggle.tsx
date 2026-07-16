@@ -8,6 +8,7 @@ const OPTIONS: { key: HeatMetric; label: string }[] = [
   { key: "affected", label: "Affected" },
   { key: "severity", label: "Severity" },
   { key: "rainfall", label: "Rainfall" },
+  { key: "outage", label: "Outages" },
 ];
 
 export function MetricToggle({
