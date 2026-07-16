@@ -4,6 +4,7 @@ import {
   createReminder,
   deleteReminder,
   listReminders,
+  type ClaimReminder,
 } from "@/lib/api/claim-reminders";
 import { qk } from "@/lib/queries/keys";
 
@@ -26,6 +27,17 @@ export function useDeleteReminder() {
   const qc = useQueryClient();
   return useMutation({
     mutationFn: (id: number) => deleteReminder(id),
-    onSuccess: () => qc.invalidateQueries({ queryKey: qk.claimReminders }),
+    onMutate: async (id: number) => {
+      await qc.cancelQueries({ queryKey: qk.claimReminders });
+      const prev = qc.getQueryData<ClaimReminder[]>(qk.claimReminders);
+      qc.setQueryData<ClaimReminder[]>(qk.claimReminders, (old) =>
+        old?.filter((r) => r.id !== id),
+      );
+      return { prev };
+    },
+    onError: (_e, _id, ctx) => {
+      if (ctx?.prev) qc.setQueryData(qk.claimReminders, ctx.prev);
+    },
+    onSettled: () => qc.invalidateQueries({ queryKey: qk.claimReminders }),
   });
 }

@@ -7,6 +7,7 @@ import { cn } from "@/lib/utils";
 import { PH_COLORS } from "@/lib/theme";
 import { Card } from "@/components/ui/card";
 import { IconInput } from "@/components/ui/icon-input";
+import { Skeleton } from "@/components/ui/skeleton";
 import { Text } from "@/components/ui/text";
 import { colorForRatio } from "@/components/heatmap/severity-scale";
 
@@ -69,6 +70,10 @@ export function WeatherList() {
   const meta = query.data?.meta;
   const maxPrecip = Math.max(1, ...rows.map((w) => w.precipitation ?? 0));
 
+  const pending = query.isLoading || query.isPlaceholderData;
+  const lastPage = meta?.last_page ?? 1;
+  const skeletonCount = Math.min(PER_PAGE, Math.max(rows.length, 3));
+
   return (
     <View className="gap-3">
       <IconInput
@@ -95,10 +100,10 @@ export function WeatherList() {
         ))}
       </View>
 
-      {query.isLoading ? (
-        <Card>
-          <Text variant="caption">Loading weather…</Text>
-        </Card>
+      {pending ? (
+        Array.from({ length: skeletonCount }).map((_, i) => (
+          <Skeleton key={i} className="h-[62px] w-full rounded-2xl" />
+        ))
       ) : rows.length === 0 ? (
         <Card>
           <Text variant="caption">No provinces match your search.</Text>
@@ -125,28 +130,28 @@ export function WeatherList() {
         ))
       )}
 
-      {meta && meta.last_page > 1 ? (
+      {lastPage > 1 ? (
         <View className="flex-row items-center justify-between">
           <Pressable
-            disabled={meta.page <= 1}
-            onPress={() => setPage(meta.page - 1)}
+            disabled={page <= 1}
+            onPress={() => setPage((p) => Math.max(1, p - 1))}
             className={cn(
               "flex-row items-center gap-1 rounded-lg border border-border px-3 py-2 active:opacity-70",
-              meta.page <= 1 && "opacity-40",
+              page <= 1 && "opacity-40",
             )}
           >
             <CaretLeft size={16} color={PH_COLORS.foreground} />
             <Text variant="label">Prev</Text>
           </Pressable>
           <Text variant="caption">
-            Page {meta.page} of {meta.last_page}
+            Page {page} of {lastPage}
           </Text>
           <Pressable
-            disabled={meta.page >= meta.last_page}
-            onPress={() => setPage(meta.page + 1)}
+            disabled={page >= lastPage}
+            onPress={() => setPage((p) => Math.min(lastPage, p + 1))}
             className={cn(
               "flex-row items-center gap-1 rounded-lg border border-border px-3 py-2 active:opacity-70",
-              meta.page >= meta.last_page && "opacity-40",
+              page >= lastPage && "opacity-40",
             )}
           >
             <Text variant="label">Next</Text>

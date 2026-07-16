@@ -16,6 +16,7 @@ import { Button } from "@/components/ui/button";
 import { Card } from "@/components/ui/card";
 import { useDialog } from "@/components/ui/dialog";
 import { Badge } from "@/components/ui/badge";
+import { Skeleton } from "@/components/ui/skeleton";
 
 type Mode = "scan" | "sms" | "token";
 type Tag = "verified" | "expired" | "unverified";
@@ -240,9 +241,7 @@ export default function MerchantOffline() {
 
       {mode === "scan" ? (
         !permission ? (
-          <Card>
-            <Text variant="caption">Preparing the camera…</Text>
-          </Card>
+          <Skeleton className="h-64 w-full rounded-2xl" />
         ) : !permission.granted ? (
           <Card className="items-center gap-3 py-6">
             <Text variant="caption" className="text-center">

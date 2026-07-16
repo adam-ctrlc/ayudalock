@@ -5,6 +5,7 @@ import { usePrices } from "@/lib/queries/prices";
 import { Screen } from "@/components/ui/screen";
 import { Text } from "@/components/ui/text";
 import { Card } from "@/components/ui/card";
+import { Skeleton } from "@/components/ui/skeleton";
 import { BackBar } from "@/components/back-bar";
 import { CategoryIcon, TrendIndicator } from "@/components/price-indicators";
 import { PriceHistoryChart } from "@/components/price-history-chart";
@@ -64,7 +65,11 @@ export default function PriceDetailScreen() {
           ) : null}
         </View>
       ) : prices.isLoading ? (
-        <Text variant="caption">Loading price…</Text>
+        <View className="gap-3">
+          <Skeleton className="h-28 w-full rounded-2xl" />
+          <Skeleton className="h-5 w-28 rounded-lg" />
+          <Skeleton className="h-40 w-full rounded-2xl" />
+        </View>
       ) : (
         <Text variant="caption">Price not found.</Text>
       )}
