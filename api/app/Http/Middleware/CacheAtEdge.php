@@ -34,7 +34,7 @@ final class CacheAtEdge
     private function isCacheable(Request $request, Response $response): bool
     {
         return match (true) {
-            ! $request->isMethod('GET') => false,
+            ! $request->isMethodCacheable() => false,
             $response->getStatusCode() !== Response::HTTP_OK => false,
             $request->hasHeader('Authorization') => false,
             default => true,

@@ -56,6 +56,22 @@ final class EdgeCacheTest extends TestCase
         $this->assertStringNotContainsString('s-maxage', (string) $response->headers->get('Cache-Control'));
     }
 
+    public function test_head_requests_are_cacheable_like_get(): void
+    {
+        $this->call('HEAD', '/api/guides')
+            ->assertOk()
+            ->assertHeader('Cache-Control', 'max-age=0, public, s-maxage=300, stale-while-revalidate=1500');
+    }
+
+    public function test_unauthenticated_api_requests_return_401_not_a_login_redirect(): void
+    {
+        $this->withHeaders(['Accept' => 'text/html'])
+            ->get('/api/programs')
+            ->assertUnauthorized();
+
+        $this->getJson('/api/locations')->assertUnauthorized();
+    }
+
     public function test_the_internal_refresh_seam_is_not_edge_cached(): void
     {
         config(['services.energy.refresh_secret' => 'test-secret']);
