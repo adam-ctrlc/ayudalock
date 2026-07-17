@@ -1,5 +1,7 @@
 import { useCallback } from "react";
-import { View } from "react-native";
+import { Pressable, View } from "react-native";
+import { Link } from "expo-router";
+import { CaretRight, Storefront } from "phosphor-react-native";
 
 import { useDashboardStats, useHeatmap } from "@/lib/queries/dashboard";
 import { PH_COLORS } from "@/lib/theme";
@@ -77,6 +79,26 @@ export default function LguDashboard() {
         </View>
         <NotificationBell />
       </View>
+
+      <Link href="/relief" asChild>
+        <Pressable className="active:opacity-80">
+          <Card className="flex-row items-center gap-3">
+            <View
+              className="h-11 w-11 items-center justify-center rounded-2xl"
+              style={{ backgroundColor: "#0038a814" }}
+            >
+              <Storefront size={22} color={PH_COLORS.blue} weight="duotone" />
+            </View>
+            <View className="flex-1">
+              <Text variant="label">Relief operations</Text>
+              <Text variant="caption">
+                Add service points, set stock, adjust program caps.
+              </Text>
+            </View>
+            <CaretRight size={18} color={PH_COLORS.mutedForeground} />
+          </Card>
+        </Pressable>
+      </Link>
 
       {stats.isLoading ? (
         <View className="flex-row gap-3">

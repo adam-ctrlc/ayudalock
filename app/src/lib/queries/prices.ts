@@ -2,6 +2,7 @@ import { useMutation, useQuery, useQueryClient } from "@tanstack/react-query";
 
 import {
   createPrice,
+  deletePrice,
   getPriceHistory,
   listPrices,
   listRegions,
@@ -55,6 +56,14 @@ export function useUpdatePrice() {
   return useMutation({
     mutationFn: (args: { id: number; value: number }) =>
       updatePrice(args.id, { value: args.value }),
+    onSuccess: () => qc.invalidateQueries({ queryKey: qk.prices }),
+  });
+}
+
+export function useDeletePrice() {
+  const qc = useQueryClient();
+  return useMutation({
+    mutationFn: (id: number) => deletePrice(id),
     onSuccess: () => qc.invalidateQueries({ queryKey: qk.prices }),
   });
 }

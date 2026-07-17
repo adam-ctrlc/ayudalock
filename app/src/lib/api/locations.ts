@@ -49,3 +49,46 @@ export async function getLocation(id: number, signal?: AbortSignal) {
   });
   return res.data;
 }
+
+export type LocationInput = {
+  name: string;
+  type: LocationType;
+  barangay_id: number;
+  latitude?: number | null;
+  longitude?: number | null;
+  is_active?: boolean;
+  has_generator?: boolean;
+};
+
+export async function createLocation(body: LocationInput) {
+  const res = await apiRequest<{ data: Location }>("/locations", {
+    method: "POST",
+    body,
+  });
+  return res.data;
+}
+
+export async function updateLocation(id: number, body: Partial<LocationInput>) {
+  const res = await apiRequest<{ data: Location }>(`/locations/${id}`, {
+    method: "PUT",
+    body,
+  });
+  return res.data;
+}
+
+export async function deleteLocation(id: number) {
+  return apiRequest<{ message: string }>(`/locations/${id}`, {
+    method: "DELETE",
+  });
+}
+
+export async function restockLocation(
+  id: number,
+  body: { commodity_id: number; quantity_available: number },
+) {
+  const res = await apiRequest<{ data: Inventory }>(`/locations/${id}/restock`, {
+    method: "POST",
+    body,
+  });
+  return res.data;
+}

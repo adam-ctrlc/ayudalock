@@ -83,3 +83,7 @@ export async function updatePrice(
   });
   return res.data;
 }
+
+export function deletePrice(id: number) {
+  return apiRequest<{ message: string }>(`/prices/${id}`, { method: "DELETE" });
+}

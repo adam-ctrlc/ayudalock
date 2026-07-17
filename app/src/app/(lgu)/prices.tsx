@@ -1,14 +1,17 @@
 import { useState } from "react";
 import { Pressable, View } from "react-native";
+import { Trash } from "phosphor-react-native";
 
 import { ApiError } from "@/lib/api/client";
 import type { PriceCategory } from "@/lib/api/prices";
 import {
   useCreatePrice,
   usePrices,
+  useDeletePrice,
   useUpdatePrice,
 } from "@/lib/queries/prices";
 import { cn } from "@/lib/utils";
+import { PH_COLORS } from "@/lib/theme";
 import { Screen } from "@/components/ui/screen";
 import { Text } from "@/components/ui/text";
 import { Input } from "@/components/ui/input";
@@ -28,6 +31,7 @@ export default function LguPrices() {
   const prices = usePrices("all");
   const create = useCreatePrice();
   const update = useUpdatePrice();
+  const remove = useDeletePrice();
   const dialog = useDialog();
 
   const [category, setCategory] = useState<PriceCategory>("fuel");
@@ -146,6 +150,22 @@ export default function LguPrices() {
                   </Text>
                 </View>
                 <Text className="text-lg font-bold">₱{p.value.toFixed(2)}</Text>
+                <Pressable
+                  hitSlop={8}
+                  className="pl-3"
+                  onPress={async () => {
+                    const ok = await dialog.confirm({
+                      title: `Remove ${p.name}?`,
+                      message: `This deletes the ${p.region} reference and its price history.`,
+                    });
+
+                    if (ok) {
+                      remove.mutate(p.id);
+                    }
+                  }}
+                >
+                  <Trash size={18} color={PH_COLORS.red} />
+                </Pressable>
               </View>
               <View className="flex-row items-center gap-2">
                 <Input

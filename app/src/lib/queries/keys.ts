@@ -12,6 +12,7 @@ export const qk = {
   stats: ["stats"] as const,
   heatmap: ["heatmap"] as const,
   voucherKey: ["voucher-key"] as const,
+  programs: ["programs"] as const,
   energyGrid: ["energy-grid"] as const,
   interruptions: ["interruptions"] as const,
   outageMap: ["outage-map"] as const,
