@@ -87,13 +87,90 @@ final class EnergyTest extends TestCase
         $this->assertSame(PowerStatus::Generator, $location->fresh()->power_status);
     }
 
+    public function test_store_serves_again_once_the_brownout_window_passes(): void
+    {
+        $scenario = $this->makeFoodScenario();
+        $location = $scenario['location'];
+        $barangay = $location->barangay;
+
+        PowerInterruption::query()->create([
+            'type' => InterruptionType::Rotating,
+            'status' => InterruptionStatus::Announced,
+            'utility' => 'Meralco',
+            'province_code' => $barangay->province_code,
+            'barangay_id' => $barangay->id,
+            'starts_at' => now()->subHour(),
+            'ends_at' => now()->addHour(),
+        ]);
+
+        app(EnergyImpactService::class)->syncPowerStatus();
+
+        $this->assertSame(PowerStatus::Offline, $location->fresh()->power_status);
+
+        $this->withAuth($scenario['citizen']);
+
+        $this->postJson('/api/allocations', [
+            'location_id' => $location->id,
+            'commodity_id' => $scenario['commodity']->id,
+            'quantity' => 1,
+        ])->assertStatus(422);
+
+        $this->travelTo(now()->addHours(2));
+
+        $this->postJson('/api/allocations', [
+            'location_id' => $location->id,
+            'commodity_id' => $scenario['commodity']->id,
+            'quantity' => 1,
+        ])->assertCreated();
+    }
+
+    public function test_store_goes_dark_when_a_scheduled_window_opens(): void
+    {
+        $scenario = $this->makeFoodScenario();
+        $location = $scenario['location'];
+        $barangay = $location->barangay;
+
+        PowerInterruption::query()->create([
+            'type' => InterruptionType::Scheduled,
+            'status' => InterruptionStatus::Announced,
+            'utility' => 'Meralco',
+            'province_code' => $barangay->province_code,
+            'barangay_id' => $barangay->id,
+            'starts_at' => now()->addHours(2),
+            'ends_at' => now()->addHours(5),
+        ]);
+
+        $this->withAuth($scenario['citizen']);
+
+        $this->postJson('/api/allocations', [
+            'location_id' => $location->id,
+            'commodity_id' => $scenario['commodity']->id,
+            'quantity' => 1,
+        ])->assertCreated();
+
+        $this->travelTo(now()->addHours(3));
+
+        $this->postJson('/api/allocations', [
+            'location_id' => $location->id,
+            'commodity_id' => $scenario['commodity']->id,
+            'quantity' => 1,
+        ])->assertStatus(422);
+    }
+
     public function test_claiming_is_blocked_at_a_dark_store(): void
     {
         $scenario = $this->makeFoodScenario();
         $location = $scenario['location'];
 
-        $location->power_status = PowerStatus::Offline;
-        $location->save();
+        PowerInterruption::query()->create([
+            'type' => InterruptionType::Rotating,
+            'status' => InterruptionStatus::Announced,
+            'utility' => 'Meralco',
+            'province_code' => $location->barangay->province_code,
+            'barangay_id' => $location->barangay_id,
+            'starts_at' => now()->subHour(),
+            'ends_at' => now()->addHour(),
+        ]);
 
         $response = $this->withAuth($scenario['citizen'])->postJson('/api/allocations', [
             'location_id' => $location->id,
@@ -116,8 +193,18 @@ final class EnergyTest extends TestCase
         $scenario = $this->makeFoodScenario();
         $location = $scenario['location'];
 
-        $location->power_status = PowerStatus::Generator;
+        $location->has_generator = true;
         $location->save();
+
+        PowerInterruption::query()->create([
+            'type' => InterruptionType::Rotating,
+            'status' => InterruptionStatus::Announced,
+            'utility' => 'Meralco',
+            'province_code' => $location->barangay->province_code,
+            'barangay_id' => $location->barangay_id,
+            'starts_at' => now()->subHour(),
+            'ends_at' => now()->addHour(),
+        ]);
 
         $this->withAuth($scenario['citizen'])->postJson('/api/allocations', [
             'location_id' => $location->id,
@@ -179,6 +266,51 @@ final class EnergyTest extends TestCase
             'starts_at' => now()->toIso8601String(),
             'ends_at' => now()->addHours(2)->toIso8601String(),
         ])->assertCreated();
+    }
+
+    public function test_energy_refresh_is_rejected_without_the_secret(): void
+    {
+        config(['services.energy.refresh_secret' => 'test-secret']);
+
+        $this->getJson('/api/internal/energy/refresh')->assertForbidden();
+        $this->getJson('/api/internal/energy/refresh?token=wrong')->assertForbidden();
+    }
+
+    public function test_energy_refresh_is_disabled_when_no_secret_is_configured(): void
+    {
+        config(['services.energy.refresh_secret' => null]);
+
+        $this->getJson('/api/internal/energy/refresh?token=anything')->assertForbidden();
+    }
+
+    public function test_energy_refresh_restores_power_status(): void
+    {
+        config(['services.energy.refresh_secret' => 'test-secret']);
+
+        $scenario = $this->makeFoodScenario();
+        $location = $scenario['location'];
+
+        PowerInterruption::query()->create([
+            'type' => InterruptionType::Rotating,
+            'status' => InterruptionStatus::Announced,
+            'utility' => 'Meralco',
+            'province_code' => $location->barangay->province_code,
+            'barangay_id' => $location->barangay_id,
+            'starts_at' => now()->subHour(),
+            'ends_at' => now()->addHour(),
+        ]);
+
+        app(EnergyImpactService::class)->syncPowerStatus();
+        $this->assertSame(PowerStatus::Offline, $location->fresh()->power_status);
+
+        $this->travelTo(now()->addHours(2));
+
+        $this->withHeader('Authorization', 'Bearer test-secret')
+            ->postJson('/api/internal/energy/refresh')
+            ->assertOk()
+            ->assertJsonStructure(['power_status_changed', 'allocations_released']);
+
+        $this->assertSame(PowerStatus::Online, $location->fresh()->power_status);
     }
 
     public function test_interruption_must_end_after_it_starts(): void

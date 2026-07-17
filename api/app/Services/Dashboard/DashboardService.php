@@ -5,6 +5,7 @@ declare(strict_types=1);
 namespace App\Services\Dashboard;
 
 use App\Enums\AllocationStatus;
+use App\Enums\BlockedReason;
 use App\Models\Barangay;
 use Illuminate\Support\Facades\DB;
 
@@ -108,6 +109,46 @@ final class DashboardService
             ],
             'redemptions_by_location' => $byLocation,
             'subsidies_by_program' => $byProgram,
+            'blocked_claims' => $this->blockedClaims(),
+        ];
+    }
+
+    /**
+     * @return array<string, mixed>
+     */
+    public function blockedClaims(): array
+    {
+        $rows = DB::table('blocked_claims')
+            ->groupBy('reason')
+            ->get(['reason', DB::raw('COUNT(*) as count')]);
+
+        $leakagePrevented = 0;
+        $byReason = [];
+
+        foreach ($rows as $row) {
+            $reason = BlockedReason::tryFrom((string) $row->reason);
+            $count = (int) $row->count;
+
+            if ($reason === null) {
+                continue;
+            }
+
+            if ($reason->isLeakagePrevented()) {
+                $leakagePrevented += $count;
+            }
+
+            $byReason[] = [
+                'reason' => $reason->value,
+                'label' => $reason->label(),
+                'count' => $count,
+                'is_leakage_prevented' => $reason->isLeakagePrevented(),
+            ];
+        }
+
+        return [
+            'total' => array_sum(array_column($byReason, 'count')),
+            'leakage_prevented' => $leakagePrevented,
+            'by_reason' => $byReason,
         ];
     }
 }

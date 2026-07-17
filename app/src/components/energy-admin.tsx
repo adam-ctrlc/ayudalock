@@ -26,6 +26,7 @@ import {
   gridLevelVariant,
   interruptionWindow,
 } from "@/components/energy/energy-labels";
+import { PowerStatusBadge } from "@/components/energy/power-status-badge";
 
 type Barangay = { id: number; name: string };
 
@@ -240,6 +241,28 @@ export function EnergyAdmin() {
 
         <Button label="Declare interruption" loading={create.isPending} onPress={submit} />
       </Card>
+
+      <Text variant="heading">Service points</Text>
+      {locations.isLoading ? (
+        <Skeleton className="h-16 w-full rounded-2xl" />
+      ) : (
+        <View className="gap-2">
+          {(locations.data ?? []).map((location) => (
+            <Card
+              key={location.id}
+              className="flex-row items-center justify-between p-3"
+            >
+              <View className="flex-1 pr-2">
+                <Text variant="label">{location.name}</Text>
+                {location.has_generator ? (
+                  <Text variant="caption">Backup generator on site</Text>
+                ) : null}
+              </View>
+              <PowerStatusBadge status={location.power_status} />
+            </Card>
+          ))}
+        </View>
+      )}
 
       <Text variant="heading">Scheduled and ongoing</Text>
       {interruptions.isLoading ? (

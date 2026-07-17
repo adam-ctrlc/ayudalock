@@ -9,6 +9,7 @@ use App\Http\Controllers\Api\AuthController;
 use App\Http\Controllers\Api\ClaimReminderController;
 use App\Http\Controllers\Api\DashboardController;
 use App\Http\Controllers\Api\EligibilityController;
+use App\Http\Controllers\Api\EnergyRefreshController;
 use App\Http\Controllers\Api\GridStatusController;
 use App\Http\Controllers\Api\HazardEventController;
 use App\Http\Controllers\Api\HeatmapController;
@@ -56,6 +57,7 @@ Route::match(['get', 'post'], 'internal/hazards/refresh', [HazardEventController
 Route::get('energy/grid', [GridStatusController::class, 'index']);
 Route::get('energy/interruptions', [PowerInterruptionController::class, 'index']);
 Route::get('heatmap/outages', [PowerInterruptionController::class, 'heatmap']);
+Route::match(['get', 'post'], 'internal/energy/refresh', EnergyRefreshController::class);
 
 Route::middleware('auth:api')->group(function (): void {
     Route::get('locations', [LocationController::class, 'index']);

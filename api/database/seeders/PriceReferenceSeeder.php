@@ -14,18 +14,18 @@ final class PriceReferenceSeeder extends Seeder
     public function run(PriceReferenceService $prices): void
     {
         $base = [
-            ['category' => PriceCategory::Fuel->value, 'name' => 'Diesel', 'value' => 58.75, 'unit' => 'per liter'],
-            ['category' => PriceCategory::Fuel->value, 'name' => 'Gasoline (RON95)', 'value' => 63.40, 'unit' => 'per liter'],
-            ['category' => PriceCategory::Fuel->value, 'name' => 'Kerosene', 'value' => 71.20, 'unit' => 'per liter'],
+            ['category' => PriceCategory::Fuel->value, 'name' => 'Diesel', 'value' => 132.50, 'unit' => 'per liter'],
+            ['category' => PriceCategory::Fuel->value, 'name' => 'Gasoline (RON95)', 'value' => 104.80, 'unit' => 'per liter'],
+            ['category' => PriceCategory::Fuel->value, 'name' => 'Kerosene', 'value' => 112.90, 'unit' => 'per liter'],
 
             ['category' => PriceCategory::Fare->value, 'name' => 'Jeepney (first 4 km)', 'value' => 13.00, 'unit' => 'PHP'],
             ['category' => PriceCategory::Fare->value, 'name' => 'Tricycle (first km)', 'value' => 12.00, 'unit' => 'PHP'],
             ['category' => PriceCategory::Fare->value, 'name' => 'UV Express (first 4 km)', 'value' => 15.00, 'unit' => 'PHP'],
 
-            ['category' => PriceCategory::Commodity->value, 'name' => 'Regular Milled Rice', 'value' => 50.00, 'unit' => 'per kg'],
-            ['category' => PriceCategory::Commodity->value, 'name' => 'Well Milled Rice', 'value' => 54.00, 'unit' => 'per kg'],
-            ['category' => PriceCategory::Commodity->value, 'name' => 'Brown Sugar', 'value' => 88.00, 'unit' => 'per kg'],
-            ['category' => PriceCategory::Commodity->value, 'name' => 'Red Onion', 'value' => 120.00, 'unit' => 'per kg'],
+            ['category' => PriceCategory::Commodity->value, 'name' => 'Regular Milled Rice', 'value' => 57.00, 'unit' => 'per kg'],
+            ['category' => PriceCategory::Commodity->value, 'name' => 'Well Milled Rice', 'value' => 62.00, 'unit' => 'per kg'],
+            ['category' => PriceCategory::Commodity->value, 'name' => 'Brown Sugar', 'value' => 95.00, 'unit' => 'per kg'],
+            ['category' => PriceCategory::Commodity->value, 'name' => 'Red Onion', 'value' => 135.00, 'unit' => 'per kg'],
         ];
 
         // Regional price multipliers: provinces often pay more for fuel/goods (transport cost).

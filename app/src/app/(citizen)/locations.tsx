@@ -13,7 +13,6 @@ import {
 
 import { ApiError } from "@/lib/api/client";
 import type { Inventory, Location } from "@/lib/api/locations";
-import type { PowerStatus } from "@/lib/api/energy";
 import { useLocations } from "@/lib/queries/locations";
 import { useEligibility } from "@/lib/queries/eligibility";
 import { useCreateAllocation } from "@/lib/queries/allocations";
@@ -35,6 +34,10 @@ import { ClaimRemindersList } from "@/components/claim-reminders-list";
 import { LeafletMap } from "@/components/leaflet-map";
 import { PriceList } from "@/components/price-list";
 import { GridAlertBanner } from "@/components/energy/grid-alert-banner";
+import {
+  powerStatusColor,
+  powerStatusShortLabel,
+} from "@/components/energy/energy-labels";
 
 function Step({ num, text }: { num: string; text: string }) {
   return (
@@ -56,28 +59,6 @@ const VIEW_LABELS: Record<View2, string> = {
   vouchers: "Vouchers",
   history: "History",
 };
-
-function powerColor(status: PowerStatus | null | undefined): string {
-  switch (status) {
-    case "offline":
-      return PH_COLORS.red;
-    case "generator":
-      return PH_COLORS.yellow;
-    default:
-      return PH_COLORS.success;
-  }
-}
-
-function powerLabel(status: PowerStatus | null | undefined): string {
-  switch (status) {
-    case "offline":
-      return "No power";
-    case "generator":
-      return "Generator";
-    default:
-      return "Open";
-  }
-}
 
 function initialSection(view?: string): Section {
   switch (view) {
@@ -362,13 +343,13 @@ export default function CitizenLocations() {
                     <View className="flex-row items-center gap-1.5">
                       <View
                         className="h-2 w-2 rounded-full"
-                        style={{ backgroundColor: powerColor(loc.power_status) }}
+                        style={{ backgroundColor: powerStatusColor(loc.power_status) }}
                       />
                       <Text
                         className="text-xs font-semibold"
-                        style={{ color: powerColor(loc.power_status) }}
+                        style={{ color: powerStatusColor(loc.power_status) }}
                       >
-                        {powerLabel(loc.power_status)}
+                        {powerStatusShortLabel(loc.power_status)}
                       </Text>
                     </View>
                   </View>

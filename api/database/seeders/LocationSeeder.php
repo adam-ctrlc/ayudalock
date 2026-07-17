@@ -17,6 +17,7 @@ final class LocationSeeder extends Seeder
     {
         $rice = Commodity::query()->where('name', 'Rice')->firstOrFail();
         $diesel = Commodity::query()->where('name', 'Diesel')->firstOrFail();
+        $gasoline = Commodity::query()->where('name', 'Gasoline')->firstOrFail();
 
         foreach (Barangay::query()->get() as $barangay) {
             $kadiwa = Location::query()->firstOrCreate(
@@ -50,6 +51,11 @@ final class LocationSeeder extends Seeder
             Inventory::query()->firstOrCreate(
                 ['location_id' => $station->id, 'commodity_id' => $diesel->id],
                 ['quantity_available' => 2000, 'quantity_locked' => 0],
+            );
+
+            Inventory::query()->firstOrCreate(
+                ['location_id' => $station->id, 'commodity_id' => $gasoline->id],
+                ['quantity_available' => 1500, 'quantity_locked' => 0],
             );
         }
     }

@@ -26,11 +26,32 @@ export type SubsidyByProgram = {
   quantity: number;
 };
 
+export type BlockedReason =
+  | "not_eligible"
+  | "over_cap"
+  | "program_inactive"
+  | "location_offline"
+  | "insufficient_stock";
+
+export type BlockedByReason = {
+  reason: BlockedReason;
+  label: string;
+  count: number;
+  is_leakage_prevented: boolean;
+};
+
+export type BlockedClaims = {
+  total: number;
+  leakage_prevented: number;
+  by_reason: BlockedByReason[];
+};
+
 export type DashboardStats = {
   active_locks: { count: number; quantity: number };
   redemptions: { count: number; quantity: number };
   redemptions_by_location: RedemptionByLocation[];
   subsidies_by_program: SubsidyByProgram[];
+  blocked_claims: BlockedClaims;
 };
 
 export async function getHeatmap(signal?: AbortSignal) {

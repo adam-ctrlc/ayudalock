@@ -1,4 +1,5 @@
 import type { GridLevel, PowerStatus } from "@/lib/api/energy";
+import { PH_COLORS } from "@/lib/theme";
 
 export function gridLevelVariant(level: GridLevel) {
   switch (level) {
@@ -30,6 +31,28 @@ export function powerStatusLabel(status: PowerStatus): string {
       return "On generator";
     default:
       return "Powered";
+  }
+}
+
+export function powerStatusShortLabel(status: PowerStatus | null | undefined): string {
+  switch (status) {
+    case "offline":
+      return "No power";
+    case "generator":
+      return "Generator";
+    default:
+      return "Open";
+  }
+}
+
+export function powerStatusColor(status: PowerStatus | null | undefined): string {
+  switch (status) {
+    case "offline":
+      return PH_COLORS.red;
+    case "generator":
+      return PH_COLORS.yellow;
+    default:
+      return PH_COLORS.success;
   }
 }
 

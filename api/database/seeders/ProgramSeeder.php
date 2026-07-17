@@ -28,19 +28,23 @@ final class ProgramSeeder extends Seeder
             ['unit' => 'kg'],
         );
 
-        $fuelSubsidy = Program::query()->firstOrCreate(
-            ['name' => 'LTFRB Fuel Subsidy'],
-            [
-                'type' => ProgramType::Fuel->value,
-                'unit' => 'liter',
-                'per_beneficiary_cap' => 10,
-                'is_active' => true,
-            ],
-        );
+        $fuelSubsidy = Program::query()
+            ->whereIn('name', ['Pantawid Pasada Fuel Subsidy', 'LTFRB Fuel Subsidy'])
+            ->first() ?? new Program();
 
-        Commodity::query()->firstOrCreate(
-            ['program_id' => $fuelSubsidy->id, 'name' => 'Diesel'],
-            ['unit' => 'liter'],
-        );
+        $fuelSubsidy->forceFill([
+            'name' => 'Pantawid Pasada Fuel Subsidy',
+            'type' => ProgramType::Fuel->value,
+            'unit' => 'liter',
+            'per_beneficiary_cap' => 150,
+            'is_active' => true,
+        ])->save();
+
+        foreach (['Diesel', 'Gasoline'] as $fuel) {
+            Commodity::query()->firstOrCreate(
+                ['program_id' => $fuelSubsidy->id, 'name' => $fuel],
+                ['unit' => 'liter'],
+            );
+        }
     }
 }

@@ -5,8 +5,11 @@ declare(strict_types=1);
 namespace App\Services\Allocation;
 
 use App\Enums\AllocationStatus;
+use App\Enums\BlockedReason;
+use App\Exceptions\BlockedClaimException;
 use App\Exceptions\DomainException;
 use App\Models\Allocation;
+use App\Models\BlockedClaim;
 use App\Models\Commodity;
 use App\Models\Inventory;
 use App\Models\Location;
@@ -28,6 +31,17 @@ final class AllocationService
 
     public function createLock(User $user, Location $location, Commodity $commodity, float $quantity): Allocation
     {
+        try {
+            return $this->attemptLock($user, $location, $commodity, $quantity);
+        } catch (BlockedClaimException $e) {
+            $this->recordBlocked($e, $user, $location, $commodity, $quantity);
+
+            throw $e;
+        }
+    }
+
+    private function attemptLock(User $user, Location $location, Commodity $commodity, float $quantity): Allocation
+    {
         if ($quantity <= 0) {
             throw new DomainException('Requested quantity must be greater than zero.');
         }
@@ -35,11 +49,18 @@ final class AllocationService
         $program = $commodity->program;
 
         if ($program === null || ! $program->is_active) {
-            throw new DomainException('This program is not currently active.');
+            throw new BlockedClaimException(
+                BlockedReason::ProgramInactive,
+                'This program is not currently active.',
+            );
         }
 
         if (! $this->eligibility->isEligibleFor($user, $program)) {
-            throw new DomainException('You are not eligible for this program.', 403);
+            throw new BlockedClaimException(
+                BlockedReason::NotEligible,
+                'You are not eligible for this program.',
+                403,
+            );
         }
 
         $this->assertLocationPowered($location);
@@ -48,7 +69,8 @@ final class AllocationService
         $alreadyHeld = $this->quantityHeldByUser($user, (int) $program->getKey());
 
         if ($alreadyHeld + $quantity > $cap) {
-            throw new DomainException(
+            throw new BlockedClaimException(
+                BlockedReason::OverCap,
                 "This request exceeds your program cap of {$cap} {$program->unit}. You already hold {$alreadyHeld}.",
             );
         }
@@ -61,7 +83,10 @@ final class AllocationService
                 ->first();
 
             if ($inventory === null || (float) $inventory->quantity_available < $quantity) {
-                throw new DomainException('This location does not have enough stock for your request.');
+                throw new BlockedClaimException(
+                    BlockedReason::InsufficientStock,
+                    'This location does not have enough stock for your request.',
+                );
             }
 
             $inventory->quantity_available = (float) $inventory->quantity_available - $quantity;
@@ -134,7 +159,7 @@ final class AllocationService
 
     private function assertLocationPowered(Location $location): void
     {
-        if ($location->power_status === null || $location->power_status->canServe()) {
+        if ($this->energyImpact->statusFor($location)->canServe()) {
             return;
         }
 
@@ -144,7 +169,26 @@ final class AllocationService
             ? "{$location->name} is offline due to a power interruption. No powered service point is available nearby right now."
             : "{$location->name} is offline due to a power interruption. Nearest service point with power: {$alternative->name}.";
 
-        throw new DomainException($message);
+        throw new BlockedClaimException(BlockedReason::LocationOffline, $message);
+    }
+
+    private function recordBlocked(
+        BlockedClaimException $exception,
+        User $user,
+        Location $location,
+        Commodity $commodity,
+        float $quantity,
+    ): void {
+        BlockedClaim::query()->create([
+            'reason' => $exception->reason,
+            'phil_sys_id' => $user->phil_sys_id,
+            'user_id' => $user->getKey(),
+            'program_id' => $commodity->program?->getKey(),
+            'location_id' => $location->getKey(),
+            'commodity_id' => $commodity->getKey(),
+            'quantity' => $quantity,
+            'detail' => $exception->getMessage(),
+        ]);
     }
 
     private function releaseInventory(Allocation $allocation): void

@@ -40,7 +40,7 @@ final class PowerInterruptionController extends Controller
 
     public function heatmap(Request $request): JsonResponse
     {
-        $hours = (int) $request->integer('hours', 24);
+        $hours = max(1, min(168, (int) $request->integer('hours', 24)));
 
         return response()->json(['data' => $this->aggregator->perProvince($hours)]);
     }

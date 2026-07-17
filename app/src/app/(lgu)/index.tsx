@@ -6,6 +6,7 @@ import { PH_COLORS } from "@/lib/theme";
 import { Screen } from "@/components/ui/screen";
 import { Text } from "@/components/ui/text";
 import { Card } from "@/components/ui/card";
+import { Badge } from "@/components/ui/badge";
 import { Skeleton, SkeletonCard } from "@/components/ui/skeleton";
 import { LeafletMap } from "@/components/leaflet-map";
 import { NotificationBell } from "@/components/notification-bell";
@@ -98,6 +99,37 @@ export default function LguDashboard() {
               quantity={stats.data.redemptions.quantity}
             />
           </View>
+
+          {stats.data.blocked_claims.total > 0 ? (
+            <View className="gap-2">
+              <Text variant="heading">Leakage prevented</Text>
+              <Card className="gap-2">
+                <View className="flex-row items-baseline gap-2">
+                  <Text className="text-3xl font-bold text-foreground">
+                    {stats.data.blocked_claims.leakage_prevented}
+                  </Text>
+                  <Text variant="caption" className="flex-1">
+                    ghost, duplicate or over-cap claims refused before any stock
+                    or money moved.
+                  </Text>
+                </View>
+                {stats.data.blocked_claims.by_reason.map((r) => (
+                  <View
+                    key={r.reason}
+                    className="flex-row items-center justify-between border-t border-border pt-2"
+                  >
+                    <Text variant="caption" className="flex-1">
+                      {r.label}
+                    </Text>
+                    <Badge
+                      variant={r.is_leakage_prevented ? "destructive" : "muted"}
+                      label={String(r.count)}
+                    />
+                  </View>
+                ))}
+              </Card>
+            </View>
+          ) : null}
 
           {stats.data.subsidies_by_program.length > 0 ? (
             <View className="gap-2">

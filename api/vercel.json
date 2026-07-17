@@ -12,6 +12,12 @@
             "dest": "/api/index.php"
         }
     ],
+    "crons": [
+        {
+            "path": "/api/internal/energy/refresh",
+            "schedule": "0 20 * * *"
+        }
+    ],
     "env": {
         "APP_ENV": "production",
         "APP_DEBUG": "false",

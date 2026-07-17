@@ -68,7 +68,7 @@ final class EnergyImpactService
     /**
      * @return Collection<int, Location>
      */
-    public function resilientAlternatives(Location $dark, int $limit = 3): Collection
+    public function resilientAlternatives(Location $dark, int $limit = 3, ?CarbonInterface $moment = null): Collection
     {
         $dark->loadMissing('barangay');
 
@@ -77,8 +77,8 @@ final class EnergyImpactService
             ->where('is_active', true)
             ->where('type', $dark->type)
             ->whereKeyNot($dark->getKey())
-            ->whereIn('power_status', [PowerStatus::Online, PowerStatus::Generator])
             ->get()
+            ->filter(fn (Location $candidate): bool => $this->statusFor($candidate, $moment)->canServe())
             ->sortBy(fn (Location $candidate): float => $this->distanceSquared($dark, $candidate))
             ->take($limit)
             ->values();
