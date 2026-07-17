@@ -6,7 +6,6 @@ import {
   Megaphone,
   Tag,
   User,
-  Warning,
 } from "phosphor-react-native";
 
 import { RoleGate } from "@/components/role-gate";
@@ -65,16 +64,7 @@ export default function LguLayout() {
         <Tabs.Screen
           name="hazards"
           options={{
-            tabBarLabel: "Hazards",
-            tabBarIcon: ({ focused, size }) => (
-              <Warning color={tabColor(focused)} size={size} />
-            ),
-          }}
-        />
-        <Tabs.Screen
-          name="energy"
-          options={{
-            tabBarLabel: "Power",
+            tabBarLabel: "Risk",
             tabBarIcon: ({ focused, size }) => (
               <Lightning color={tabColor(focused)} size={size} />
             ),

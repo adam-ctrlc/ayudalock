@@ -13,7 +13,6 @@ import {
 import { useLocations } from "@/lib/queries/locations";
 import { cn } from "@/lib/utils";
 import { PH_COLORS } from "@/lib/theme";
-import { Screen } from "@/components/ui/screen";
 import { Text } from "@/components/ui/text";
 import { Input } from "@/components/ui/input";
 import { Field } from "@/components/ui/field";
@@ -109,13 +108,10 @@ export function EnergyAdmin() {
   }
 
   return (
-    <Screen edges={["top"]}>
-      <View className="gap-0.5">
-        <Text variant="title">Grid and outages</Text>
-        <Text variant="subtitle">
-          Declare interruptions and see which service points lose power.
-        </Text>
-      </View>
+    <>
+      <Text variant="subtitle">
+        Declare interruptions and see which service points lose power.
+      </Text>
 
       <Text variant="heading">Grid status</Text>
       {grid.isLoading ? (
@@ -308,6 +304,6 @@ export function EnergyAdmin() {
           ))}
         </View>
       )}
-    </Screen>
+    </>
   );
 }

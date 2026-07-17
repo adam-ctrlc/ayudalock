@@ -12,7 +12,6 @@ import {
 import { PH_PROVINCES } from "@/lib/geo/ph-provinces";
 import { cn } from "@/lib/utils";
 import { PH_COLORS } from "@/lib/theme";
-import { Screen } from "@/components/ui/screen";
 import { Text } from "@/components/ui/text";
 import { Input } from "@/components/ui/input";
 import { Field } from "@/components/ui/field";
@@ -113,18 +112,11 @@ export function HazardsAdmin() {
   }
 
   return (
-    <Screen
-      edges={["top"]}
-      refreshing={hazards.isRefetching}
-      onRefresh={() => hazards.refetch()}
-    >
-      <View className="gap-0.5">
-        <Text variant="title">Hazards</Text>
-        <Text variant="subtitle">
-          Report typhoons, floods, and other events. Earthquakes sync
-          automatically.
-        </Text>
-      </View>
+    <>
+      <Text variant="subtitle">
+        Report typhoons, floods, and other events. Earthquakes sync
+        automatically.
+      </Text>
 
       <Card>
         <CardHeader>
@@ -271,6 +263,6 @@ export function HazardsAdmin() {
           ))}
         </View>
       )}
-    </Screen>
+    </>
   );
 }
