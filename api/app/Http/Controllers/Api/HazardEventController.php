@@ -6,6 +6,7 @@ namespace App\Http\Controllers\Api;
 
 use App\Http\Controllers\Controller;
 use App\Http\Requests\Hazard\StoreHazardEventRequest;
+use App\Http\Requests\Hazard\UpdateHazardEventRequest;
 use App\Http\Resources\HazardEventResource;
 use App\Models\HazardEvent;
 use App\Services\Hazard\ProvinceLocator;
@@ -41,6 +42,19 @@ final class HazardEventController extends Controller
         $data['occurred_at'] ??= now();
 
         return new HazardEventResource(HazardEvent::create($data));
+    }
+
+    public function update(UpdateHazardEventRequest $request, HazardEvent $hazard, ProvinceLocator $locator): HazardEventResource
+    {
+        $data = $request->validated();
+
+        if (empty($data['province_code']) && isset($data['latitude'], $data['longitude'])) {
+            $data['province_code'] = $locator->nearest((float) $data['latitude'], (float) $data['longitude']);
+        }
+
+        $hazard->update($data);
+
+        return new HazardEventResource($hazard);
     }
 
     public function destroy(HazardEvent $hazard): JsonResponse

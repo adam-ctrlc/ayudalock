@@ -19,6 +19,7 @@ use App\Http\Controllers\Api\NotificationController;
 use App\Http\Controllers\Api\PowerInterruptionController;
 use App\Http\Controllers\Api\PriceController;
 use App\Http\Controllers\Api\ProfileController;
+use App\Http\Controllers\Api\ProgramController;
 use App\Http\Controllers\Api\RedemptionController;
 use App\Http\Controllers\Api\ServiceGuideController;
 use App\Http\Controllers\Api\WeatherController;
@@ -38,25 +39,30 @@ Route::prefix('auth')->group(function (): void {
     });
 });
 
-Route::get('keys/voucher-public', [KeyController::class, 'voucherPublicKey']);
+Route::middleware('cache.edge:300')->group(function (): void {
+    Route::get('keys/voucher-public', [KeyController::class, 'voucherPublicKey']);
 
-Route::get('prices', [PriceController::class, 'index']);
-Route::get('prices/regions', [PriceController::class, 'regions']);
-Route::get('prices/{price}/history', [PriceController::class, 'history']);
+    Route::get('guides', [ServiceGuideController::class, 'index']);
+    Route::get('guides/{guide}', [ServiceGuideController::class, 'show']);
+});
 
-Route::get('guides', [ServiceGuideController::class, 'index']);
-Route::get('guides/{guide}', [ServiceGuideController::class, 'show']);
+Route::middleware('cache.edge:60')->group(function (): void {
+    Route::get('prices', [PriceController::class, 'index']);
+    Route::get('prices/regions', [PriceController::class, 'regions']);
+    Route::get('prices/{price}/history', [PriceController::class, 'history']);
 
-Route::get('heatmap/provinces', [HeatmapController::class, 'provinces']);
-Route::get('heatmap/provinces/{code}', [HeatmapController::class, 'province']);
-Route::get('heatmap/weather', [WeatherController::class, 'provinces']);
-Route::get('heatmap/weather/list', [WeatherController::class, 'list']);
-Route::get('hazards', [HazardEventController::class, 'index']);
+    Route::get('heatmap/provinces', [HeatmapController::class, 'provinces']);
+    Route::get('heatmap/provinces/{code}', [HeatmapController::class, 'province']);
+    Route::get('heatmap/weather', [WeatherController::class, 'provinces']);
+    Route::get('heatmap/weather/list', [WeatherController::class, 'list']);
+    Route::get('hazards', [HazardEventController::class, 'index']);
+
+    Route::get('energy/grid', [GridStatusController::class, 'index']);
+    Route::get('energy/interruptions', [PowerInterruptionController::class, 'index']);
+    Route::get('heatmap/outages', [PowerInterruptionController::class, 'heatmap']);
+});
+
 Route::match(['get', 'post'], 'internal/hazards/refresh', [HazardEventController::class, 'refresh']);
-
-Route::get('energy/grid', [GridStatusController::class, 'index']);
-Route::get('energy/interruptions', [PowerInterruptionController::class, 'index']);
-Route::get('heatmap/outages', [PowerInterruptionController::class, 'heatmap']);
 Route::match(['get', 'post'], 'internal/energy/refresh', EnergyRefreshController::class);
 
 Route::middleware('auth:api')->group(function (): void {
@@ -75,6 +81,7 @@ Route::middleware('auth:api')->group(function (): void {
 
     Route::middleware('role:lgu_admin,merchant')->group(function (): void {
         Route::post('announcements', [AnnouncementController::class, 'store']);
+        Route::put('announcements/{announcement}', [AnnouncementController::class, 'update']);
         Route::delete('announcements/{announcement}', [AnnouncementController::class, 'destroy']);
     });
 
@@ -101,13 +108,26 @@ Route::middleware('auth:api')->group(function (): void {
 
         Route::post('prices', [PriceController::class, 'store']);
         Route::put('prices/{price}', [PriceController::class, 'update']);
+        Route::delete('prices/{price}', [PriceController::class, 'destroy']);
+
+        Route::get('programs', [ProgramController::class, 'index']);
+        Route::put('programs/{program}', [ProgramController::class, 'update']);
+
+        Route::post('locations', [LocationController::class, 'store']);
+        Route::put('locations/{location}', [LocationController::class, 'update']);
+        Route::delete('locations/{location}', [LocationController::class, 'destroy']);
+        Route::post('locations/{location}/restock', [LocationController::class, 'restock']);
 
         Route::post('guides', [ServiceGuideController::class, 'store']);
         Route::put('guides/{guide}', [ServiceGuideController::class, 'update']);
         Route::delete('guides/{guide}', [ServiceGuideController::class, 'destroy']);
 
         Route::post('hazards', [HazardEventController::class, 'store']);
+        Route::put('hazards/{hazard}', [HazardEventController::class, 'update']);
         Route::delete('hazards/{hazard}', [HazardEventController::class, 'destroy']);
+
+        Route::put('heatmap/weather/{province:code}', [WeatherController::class, 'update']);
+        Route::delete('heatmap/weather/{province:code}', [WeatherController::class, 'clearOverride']);
 
         Route::post('energy/grid', [GridStatusController::class, 'store']);
         Route::post('energy/interruptions', [PowerInterruptionController::class, 'store']);

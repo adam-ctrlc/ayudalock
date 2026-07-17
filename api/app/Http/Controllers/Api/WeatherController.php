@@ -4,7 +4,9 @@ declare(strict_types=1);
 
 namespace App\Http\Controllers\Api;
 
+use App\Enums\WeatherSource;
 use App\Http\Controllers\Controller;
+use App\Http\Requests\Hazard\UpdateProvinceWeatherRequest;
 use App\Models\Province;
 use App\Services\Hazard\WeatherService;
 use Illuminate\Http\JsonResponse;
@@ -84,11 +86,42 @@ final class WeatherController extends Controller
         ]);
     }
 
+    public function update(UpdateProvinceWeatherRequest $request, Province $province): JsonResponse
+    {
+        $data = $request->validated();
+
+        $province->update([
+            ...$data,
+            'weather_source' => WeatherSource::Manual,
+            'weather_code' => null,
+            'weather_updated_at' => now(),
+        ]);
+
+        return response()->json(['data' => $this->format($province->fresh())]);
+    }
+
+    public function clearOverride(Province $province, WeatherService $weather): JsonResponse
+    {
+        $province->update([
+            'weather_source' => WeatherSource::OpenMeteo,
+            'weather_note' => null,
+        ]);
+
+        $weather->refresh();
+
+        return response()->json([
+            'message' => 'Override cleared. Live observations resume for this province.',
+            'data' => $this->format($province->fresh()),
+        ]);
+    }
+
     /**
      * @return array<string, mixed>
      */
     private function format(Province $province): array
     {
+        $source = $province->weather_source ?? WeatherSource::OpenMeteo;
+
         return [
             'code' => $province->code,
             'name' => $province->name,
@@ -97,6 +130,11 @@ final class WeatherController extends Controller
             'wind_speed' => $province->wind_speed,
             'weather_code' => $province->weather_code,
             'description' => $province->weather_description,
+            'source' => $source->value,
+            'source_label' => $source->label(),
+            'is_live' => $source->isLive(),
+            'note' => $province->weather_note,
+            'updated_at' => $province->weather_updated_at?->toIso8601String(),
         ];
     }
 }

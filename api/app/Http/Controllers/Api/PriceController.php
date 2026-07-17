@@ -64,4 +64,11 @@ final class PriceController extends Controller
 
         return new PriceReferenceResource($updated);
     }
+
+    public function destroy(PriceReference $price): JsonResponse
+    {
+        $price->delete();
+
+        return response()->json(['message' => 'Price reference removed.']);
+    }
 }

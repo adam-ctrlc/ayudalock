@@ -4,6 +4,7 @@ declare(strict_types=1);
 
 namespace App\Services\Hazard;
 
+use App\Enums\WeatherSource;
 use App\Models\Province;
 use Illuminate\Support\Facades\Http;
 
@@ -18,6 +19,7 @@ final class WeatherService
         $provinces = Province::query()
             ->whereNotNull('latitude')
             ->whereNotNull('longitude')
+            ->where('weather_source', '!=', WeatherSource::Manual)
             ->get();
 
         if ($provinces->isEmpty()) {
@@ -62,7 +64,9 @@ final class WeatherService
      */
     public function refreshIfStale(int $minutes = 30): void
     {
-        $last = Province::max('weather_updated_at');
+        $last = Province::query()
+            ->where('weather_source', '!=', WeatherSource::Manual)
+            ->max('weather_updated_at');
 
         if ($last !== null && now()->diffInMinutes($last) < $minutes) {
             return;

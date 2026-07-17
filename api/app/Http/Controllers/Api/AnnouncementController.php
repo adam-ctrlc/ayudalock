@@ -8,6 +8,7 @@ use App\Enums\AnnouncementCategory;
 use App\Enums\UserRole;
 use App\Http\Controllers\Controller;
 use App\Http\Requests\Announcement\StoreAnnouncementRequest;
+use App\Http\Requests\Announcement\UpdateAnnouncementRequest;
 use App\Http\Resources\AnnouncementResource;
 use App\Models\Announcement;
 use App\Models\User;
@@ -98,17 +99,31 @@ final class AnnouncementController extends Controller
         return new AnnouncementResource($announcement->load('author:id,name,role'));
     }
 
+    public function update(UpdateAnnouncementRequest $request, Announcement $announcement): AnnouncementResource
+    {
+        $this->assertMayManage($request, $announcement);
+
+        $announcement->update($request->validated());
+
+        return new AnnouncementResource($announcement->fresh(['author']));
+    }
+
     public function destroy(Request $request, Announcement $announcement): JsonResponse
+    {
+        $this->assertMayManage($request, $announcement);
+
+        $announcement->delete();
+
+        return response()->json(['message' => 'Announcement removed.']);
+    }
+
+    private function assertMayManage(Request $request, Announcement $announcement): void
     {
         $user = $request->user();
         $isOwner = (int) $announcement->author_id === (int) $user->getKey();
 
         if (! $isOwner && $user->role !== UserRole::LguAdmin) {
-            abort(Response::HTTP_FORBIDDEN, 'You can only remove your own announcements.');
+            abort(Response::HTTP_FORBIDDEN, 'You can only manage your own announcements.');
         }
-
-        $announcement->delete();
-
-        return response()->json(['message' => 'Announcement removed.']);
     }
 }
