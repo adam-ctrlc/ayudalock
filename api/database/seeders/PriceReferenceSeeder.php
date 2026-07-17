@@ -38,11 +38,26 @@ final class PriceReferenceSeeder extends Seeder
 
         foreach ($regions as $region => $multiplier) {
             foreach ($base as $item) {
+                $value = round($item['value'] * $multiplier, 2);
+                $source = 'Sample data (DOE / DTI / LTFRB reference)';
+
+                $existing = PriceReference::query()
+                    ->where('category', $item['category'])
+                    ->where('name', $item['name'])
+                    ->where('region', $region)
+                    ->first();
+
+                if ($existing !== null) {
+                    $prices->update($existing, ['value' => $value, 'source' => $source], null);
+
+                    continue;
+                }
+
                 $prices->record([
                     ...$item,
-                    'value' => round($item['value'] * $multiplier, 2),
+                    'value' => $value,
                     'region' => $region,
-                    'source' => 'Sample data (DOE / DTI / LTFRB reference)',
+                    'source' => $source,
                 ], null);
             }
         }
