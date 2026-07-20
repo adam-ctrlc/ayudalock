@@ -13,6 +13,7 @@ use App\Http\Controllers\Api\EnergyRefreshController;
 use App\Http\Controllers\Api\GridStatusController;
 use App\Http\Controllers\Api\HazardEventController;
 use App\Http\Controllers\Api\HeatmapController;
+use App\Http\Controllers\Api\IncidentReportController;
 use App\Http\Controllers\Api\KeyController;
 use App\Http\Controllers\Api\LocationController;
 use App\Http\Controllers\Api\NotificationController;
@@ -21,6 +22,7 @@ use App\Http\Controllers\Api\PriceController;
 use App\Http\Controllers\Api\ProfileController;
 use App\Http\Controllers\Api\ProgramController;
 use App\Http\Controllers\Api\RedemptionController;
+use App\Http\Controllers\Api\ReferralController;
 use App\Http\Controllers\Api\ServiceGuideController;
 use App\Http\Controllers\Api\WeatherController;
 use Illuminate\Support\Facades\Route;
@@ -75,6 +77,9 @@ Route::middleware('auth:api')->group(function (): void {
     Route::post('announcements/{announcement}/comments', [AnnouncementCommentController::class, 'store']);
     Route::delete('announcement-comments/{comment}', [AnnouncementCommentController::class, 'destroy']);
 
+    Route::get('incident-reports', [IncidentReportController::class, 'index']);
+    Route::get('incident-reports/{report}', [IncidentReportController::class, 'show']);
+
     Route::get('notifications', [NotificationController::class, 'index']);
     Route::post('notifications/read-all', [NotificationController::class, 'markAllRead']);
     Route::post('notifications/{notification}/read', [NotificationController::class, 'markRead']);
@@ -91,6 +96,8 @@ Route::middleware('auth:api')->group(function (): void {
         Route::get('allocations', [AllocationController::class, 'index']);
         Route::post('allocations', [AllocationController::class, 'store']);
         Route::delete('allocations/{allocation}', [AllocationController::class, 'destroy']);
+
+        Route::post('incident-reports', [IncidentReportController::class, 'store']);
 
         Route::get('claim-reminders', [ClaimReminderController::class, 'index']);
         Route::post('claim-reminders', [ClaimReminderController::class, 'store']);
@@ -125,6 +132,11 @@ Route::middleware('auth:api')->group(function (): void {
         Route::post('hazards', [HazardEventController::class, 'store']);
         Route::put('hazards/{hazard}', [HazardEventController::class, 'update']);
         Route::delete('hazards/{hazard}', [HazardEventController::class, 'destroy']);
+
+        Route::put('incident-reports/{report}', [IncidentReportController::class, 'update']);
+        Route::post('incident-reports/{report}/promote', [IncidentReportController::class, 'promote']);
+        Route::delete('incident-reports/{report}', [IncidentReportController::class, 'destroy']);
+        Route::put('referrals/{referral}', [ReferralController::class, 'update']);
 
         Route::put('heatmap/weather/{province:code}', [WeatherController::class, 'update']);
         Route::delete('heatmap/weather/{province:code}', [WeatherController::class, 'clearOverride']);

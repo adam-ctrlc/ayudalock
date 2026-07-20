@@ -24,6 +24,7 @@ class DatabaseSeeder extends Seeder
             HazardEventSeeder::class,
             GridStatusSeeder::class,
             PowerInterruptionSeeder::class,
+            ResponseTeamSeeder::class,
         ]);
     }
 }
