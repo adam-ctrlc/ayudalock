@@ -9,6 +9,8 @@ import { useCreateIncidentReport } from "@/lib/queries/incident-reports";
 import { useDeviceLocation } from "@/lib/use-device-location";
 import { captureIncidentPhoto, pickIncidentPhoto } from "@/lib/incident-photo";
 import { PH_PROVINCES } from "@/lib/geo/ph-provinces";
+import { latLngToSvg } from "@/lib/geo/svg-to-latlng";
+import { provinceAt } from "@/lib/geo/point-in-province";
 import { cn } from "@/lib/utils";
 import { PH_COLORS } from "@/lib/theme";
 import { Text } from "@/components/ui/text";
@@ -92,6 +94,17 @@ export function IncidentReportForm() {
       default:
         return "manual_province";
     }
+  }
+
+  async function useMyLocation() {
+    const found = await location.locate();
+
+    if (found === null) return;
+
+    const point = latLngToSvg(found.latitude, found.longitude);
+    const guess = provinceAt(point.x, point.y);
+
+    if (guess !== null) setProvinceCode(guess.code);
   }
 
   async function addPhoto(capture: boolean) {
@@ -223,7 +236,7 @@ export function IncidentReportForm() {
             </Text>
             <Pressable onPress={location.reset} hitSlop={6}>
               <Text className="text-xs font-semibold text-primary">
-                Use a province instead
+                Drop my location
               </Text>
             </Pressable>
           </View>
@@ -237,7 +250,7 @@ export function IncidentReportForm() {
                   : "Use my current location"
               }
               loading={location.state.status === "locating"}
-              onPress={() => location.locate()}
+              onPress={useMyLocation}
             />
 
             {location.state.status === "denied" ? (
@@ -253,43 +266,52 @@ export function IncidentReportForm() {
               </Text>
             ) : null}
 
-            {provinceCode ? (
-              <Pressable
-                onPress={() => {
-                  setProvinceCode(null);
-                  setProvinceQuery("");
-                }}
-                className="h-12 flex-row items-center justify-between rounded-xl border border-input bg-muted px-4"
-              >
-                <Text variant="label">{provinceName}</Text>
-                <Text variant="caption" className="text-primary">
-                  Change
-                </Text>
-              </Pressable>
-            ) : (
-              <View className="gap-2">
-                <Input
-                  value={provinceQuery}
-                  onChangeText={setProvinceQuery}
-                  autoCapitalize="words"
-                  placeholder="Search a province"
-                />
-                {matches.map((p) => (
-                  <Pressable
-                    key={p.code}
-                    onPress={() => {
-                      setProvinceCode(p.code);
-                      setProvinceQuery("");
-                    }}
-                    className="rounded-xl border border-border px-4 py-2.5 active:opacity-70"
-                  >
-                    <Text variant="label">{p.title}</Text>
-                  </Pressable>
-                ))}
-              </View>
-            )}
           </>
         )}
+
+        <View className="gap-2 border-t border-border pt-3">
+          <Text variant="caption">
+            {fix
+              ? "Province, worked out from your pin. Correct it if it is wrong."
+              : "Province"}
+          </Text>
+
+          {provinceCode ? (
+            <Pressable
+              onPress={() => {
+                setProvinceCode(null);
+                setProvinceQuery("");
+              }}
+              className="h-12 flex-row items-center justify-between rounded-xl border border-input bg-muted px-4"
+            >
+              <Text variant="label">{provinceName}</Text>
+              <Text variant="caption" className="text-primary">
+                Change
+              </Text>
+            </Pressable>
+          ) : (
+            <View className="gap-2">
+              <Input
+                value={provinceQuery}
+                onChangeText={setProvinceQuery}
+                autoCapitalize="words"
+                placeholder="Search a province"
+              />
+              {matches.map((p) => (
+                <Pressable
+                  key={p.code}
+                  onPress={() => {
+                    setProvinceCode(p.code);
+                    setProvinceQuery("");
+                  }}
+                  className="rounded-xl border border-border px-4 py-2.5 active:opacity-70"
+                >
+                  <Text variant="label">{p.title}</Text>
+                </Pressable>
+              ))}
+            </View>
+          )}
+        </View>
       </Card>
 
       <Card className="gap-3">
