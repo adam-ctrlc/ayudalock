@@ -1,4 +1,4 @@
-import { useRef, useState } from "react";
+import { useCallback, useRef, useState } from "react";
 import { ScrollView, View } from "react-native";
 
 import { useProvinceImpacts } from "@/lib/queries/heatmap";
@@ -6,7 +6,7 @@ import { useProvinceWeather } from "@/lib/queries/weather";
 import { useOutageMap } from "@/lib/queries/energy";
 import type { ProvinceWeather } from "@/lib/api/weather";
 import { useAuth } from "@/lib/auth/context";
-import { PH_VIEWBOX } from "@/lib/geo/ph-provinces";
+import { PH_PROVINCES, PH_VIEWBOX } from "@/lib/geo/ph-provinces";
 import { Screen } from "@/components/ui/screen";
 import { Text } from "@/components/ui/text";
 import { Skeleton } from "@/components/ui/skeleton";
@@ -24,6 +24,10 @@ import { LatestAlerts } from "@/components/latest-alerts";
 
 const ASPECT = PH_VIEWBOX.width / PH_VIEWBOX.height;
 
+const PROVINCE_TITLES: Record<string, string> = Object.fromEntries(
+  PH_PROVINCES.map((province) => [province.code, province.title]),
+);
+
 function metricCaption(metric: HeatMetric): string {
   switch (metric) {
     case "affected":
@@ -34,6 +38,30 @@ function metricCaption(metric: HeatMetric): string {
       return "Shaded by current rainfall (mm).";
     case "outage":
       return "Shaded by households without power (next 24 hours).";
+  }
+}
+
+function compact(value: number): string {
+  switch (true) {
+    case value >= 1_000_000:
+      return `${(value / 1_000_000).toFixed(1)}M`;
+    case value >= 1_000:
+      return `${(value / 1_000).toFixed(1)}k`;
+    default:
+      return String(Math.round(value));
+  }
+}
+
+function metricValue(metric: HeatMetric, value: number): string {
+  switch (metric) {
+    case "affected":
+      return `${compact(value)} affected`;
+    case "severity":
+      return `${Math.round(value)}/100`;
+    case "rainfall":
+      return `${value.toFixed(1)}mm`;
+    case "outage":
+      return `${compact(value)} homes`;
   }
 }
 
@@ -53,6 +81,17 @@ export function ImpactDashboard({ showBack = false }: { showBack?: boolean }) {
     pendingScroll.current = true;
     setSelected(code);
   }
+
+  const labelFor = useCallback(
+    (code: string, value: number) => {
+      const title = PROVINCE_TITLES[code];
+
+      if (title === undefined) return null;
+
+      return { title, value: metricValue(metric, value) };
+    },
+    [metric],
+  );
 
   const rows = impacts.data ?? [];
   const weatherRows = weather.data ?? [];
@@ -120,12 +159,13 @@ export function ImpactDashboard({ showBack = false }: { showBack?: boolean }) {
           selectedCode={selected}
           onSelect={handleSelect}
           onInteractionChange={setLockScroll}
+          labelFor={labelFor}
         />
       )}
 
       <Text variant="caption">
-        {metricCaption(metric)} Tap a province to zoom in and see details, or use
-        the + / - controls.
+        {metricCaption(metric)} Highest-value provinces are labelled. Tap a
+        province to zoom in and see details, or use the + / - controls.
       </Text>
 
       {selected ? (

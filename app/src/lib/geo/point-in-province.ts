@@ -1,6 +1,6 @@
 import { PH_PROVINCES, type ProvincePath } from "@/lib/geo/ph-provinces";
 
-function pointInRing(x: number, y: number, ring: number[]): boolean {
+export function pointInRing(x: number, y: number, ring: number[]): boolean {
   let inside = false;
   for (let i = 0, j = ring.length - 2; i < ring.length; j = i, i += 2) {
     const xi = ring[i];

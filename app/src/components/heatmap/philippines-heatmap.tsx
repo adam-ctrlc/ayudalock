@@ -1,5 +1,5 @@
-import { useRef } from "react";
-import { Pressable, View } from "react-native";
+import { useCallback, useRef, useState } from "react";
+import { type LayoutChangeEvent, Pressable, View } from "react-native";
 import { CornersOut, Minus, Plus } from "phosphor-react-native";
 import Svg, { Path } from "react-native-svg";
 
@@ -13,6 +13,7 @@ import {
   NO_DATA_COLOR,
   colorForRatio,
 } from "@/components/heatmap/severity-scale";
+import { MapLabels, type MapLabel } from "@/components/heatmap/map-labels";
 
 function ControlButton({
   onPress,
@@ -37,18 +38,31 @@ export function PhilippinesHeatmap({
   selectedCode,
   onSelect,
   onInteractionChange,
+  labelFor,
 }: {
   values: Record<string, number>;
   maxValue: number;
   selectedCode?: string | null;
   onSelect?: (code: string) => void;
   onInteractionChange?: (active: boolean) => void;
+  labelFor?: (code: string, value: number) => MapLabel | null;
 }) {
   const mapRef = useRef<ReturnType<typeof usePanZoom> | null>(null);
+  const [size, setSize] = useState({ width: 0, height: 0 });
+  const [interacting, setInteracting] = useState(false);
+
+  const handleInteraction = useCallback(
+    (active: boolean) => {
+      setInteracting(active);
+      onInteractionChange?.(active);
+    },
+    [onInteractionChange],
+  );
+
   const map = usePanZoom({
     width: PH_VIEWBOX.width,
     height: PH_VIEWBOX.height,
-    onInteractionChange,
+    onInteractionChange: handleInteraction,
     onTap: (x, y) => {
       const province = provinceAt(x, y);
       if (!province) return;
@@ -58,12 +72,18 @@ export function PhilippinesHeatmap({
   });
   mapRef.current = map;
 
+  function onLayout(event: LayoutChangeEvent) {
+    map.onLayout(event);
+    const { width, height } = event.nativeEvent.layout;
+    setSize({ width, height });
+  }
+
   return (
     <View
       className="relative w-full overflow-hidden rounded-2xl border border-border bg-card"
       style={{ aspectRatio: map.aspect }}
     >
-      <View className="absolute inset-0" onLayout={map.onLayout} {...map.panHandlers}>
+      <View className="absolute inset-0" onLayout={onLayout} {...map.panHandlers}>
         <Svg width="100%" height="100%" viewBox={map.viewBox}>
           {PH_PROVINCES.map((province) => {
             const value = values[province.code] ?? 0;
@@ -81,6 +101,17 @@ export function PhilippinesHeatmap({
           })}
         </Svg>
       </View>
+
+      {labelFor && !interacting ? (
+        <MapLabels
+          values={values}
+          maxValue={maxValue}
+          box={map.box}
+          width={size.width}
+          height={size.height}
+          labelFor={labelFor}
+        />
+      ) : null}
 
       <View className="absolute inset-0" pointerEvents="box-none">
         <View className="absolute left-2 top-2 gap-1 rounded-lg border border-border bg-card px-2 py-1.5">
