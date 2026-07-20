@@ -16,6 +16,21 @@
           "cameraPermission": "Allow AyudaLock to scan voucher QR codes."
         }
       ],
+      [
+        "expo-location",
+        {
+          "locationAlwaysAndWhenInUsePermission": "Allow AyudaLock to attach your location to an incident report so responders know where to go.",
+          "locationWhenInUsePermission": "Allow AyudaLock to attach your location to an incident report so responders know where to go.",
+          "isAndroidBackgroundLocationEnabled": false
+        }
+      ],
+      [
+        "expo-image-picker",
+        {
+          "photosPermission": "Allow AyudaLock to attach a photo to your incident report.",
+          "cameraPermission": "Allow AyudaLock to take a photo for your incident report."
+        }
+      ],
       "@react-native-community/datetimepicker"
     ],
     "name": "app",

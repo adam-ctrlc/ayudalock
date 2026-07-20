@@ -1,9 +1,10 @@
 import { useCallback } from "react";
 import { Pressable, View } from "react-native";
 import { Link } from "expo-router";
-import { CaretRight, Storefront } from "phosphor-react-native";
+import { CaretRight, Megaphone, Storefront } from "phosphor-react-native";
 
 import { useDashboardStats, useHeatmap } from "@/lib/queries/dashboard";
+import { useIncidentReports } from "@/lib/queries/incident-reports";
 import { PH_COLORS } from "@/lib/theme";
 import { Screen } from "@/components/ui/screen";
 import { Text } from "@/components/ui/text";
@@ -52,6 +53,9 @@ function DepletionBar({ rate }: { rate: number }) {
 export default function LguDashboard() {
   const stats = useDashboardStats();
   const heatmap = useHeatmap();
+  const pending = useIncidentReports({ status: "submitted" });
+
+  const pendingReports = (pending.data ?? []).length;
 
   const refreshing = stats.isRefetching || heatmap.isRefetching;
   const onRefresh = useCallback(() => {
@@ -79,6 +83,30 @@ export default function LguDashboard() {
         </View>
         <NotificationBell />
       </View>
+
+      <Link href="/reports" asChild>
+        <Pressable className="active:opacity-80">
+          <Card className="flex-row items-center gap-3">
+            <View
+              className="h-11 w-11 items-center justify-center rounded-2xl"
+              style={{ backgroundColor: "#ce112614" }}
+            >
+              <Megaphone size={22} color={PH_COLORS.red} weight="duotone" />
+            </View>
+            <View className="flex-1">
+              <Text variant="label">Incident reports</Text>
+              <Text variant="caption">
+                Verify what citizens send in, then refer it to an agency.
+              </Text>
+            </View>
+            {pendingReports > 0 ? (
+              <Badge variant="destructive" label={String(pendingReports)} />
+            ) : (
+              <CaretRight size={18} color={PH_COLORS.mutedForeground} />
+            )}
+          </Card>
+        </Pressable>
+      </Link>
 
       <Link href="/relief" asChild>
         <Pressable className="active:opacity-80">

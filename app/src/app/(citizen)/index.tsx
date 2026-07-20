@@ -6,6 +6,7 @@ import {
   BellRinging,
   BookOpen,
   CaretRight,
+  Megaphone,
   SealCheck,
   Tag,
 } from "phosphor-react-native";
@@ -129,6 +130,23 @@ export default function CitizenHome() {
           </Text>
         )}
       </Card>
+
+      <Link href="/report" asChild>
+        <Pressable className="active:opacity-80">
+          <Card className="flex-row items-center gap-3">
+            <View className="h-11 w-11 items-center justify-center rounded-xl bg-secondary">
+              <Megaphone size={22} color={PH_COLORS.red} weight="duotone" />
+            </View>
+            <View className="flex-1 gap-0.5">
+              <Text variant="label">Report an incident</Text>
+              <Text variant="caption">
+                Flooding, fire, a blocked road or a downed line near you
+              </Text>
+            </View>
+            <CaretRight size={18} color={PH_COLORS.mutedForeground} />
+          </Card>
+        </Pressable>
+      </Link>
 
       <Text variant="heading">Quick actions</Text>
       <View className="flex-row gap-3">
